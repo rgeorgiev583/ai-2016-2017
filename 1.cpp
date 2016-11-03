@@ -113,7 +113,7 @@ struct FrogsState
                     return true;
                 }
                 break;
-            
+
             default:
                 break;
         }
@@ -152,7 +152,7 @@ struct FrogsState
                 Lilies[BlankPos] = Frog::None;
                 Movement = prevMovement;
                 return true;
-            
+
             default:
                 break;
         }
@@ -160,20 +160,6 @@ struct FrogsState
         return false;
     };
 };
-
-/*
-namespace std
-{
-    template <>
-    struct hash<FrogsState>
-    {
-        size_t operator()(const FrogsState& k) const
-        {
-            return ((hash<size_t>()(k.Count) ^ (hash<vector<Frog> >()(k.Lilies) << 1)) >> 1) ^ (hash<int>()(k.BlankPos) << 1);
-        }
-    };
-};
-*/
 
 int main()
 {
