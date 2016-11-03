@@ -15,7 +15,7 @@ struct FrogsState
     Step Movement;
 
     FrogsState(): Count(0), BlankPos(-1), Movement(Step::None) {}
-    FrogsState(size_t count): Count(count), Lilies(2 * Count + 1), BlankPos(Count), Movement(Step::None)
+    FrogsState(size_t count): Lilies(2 * count + 1), Count(count), BlankPos(count), Movement(Step::None)
     {
         for (auto i = 0; i < Count; i++)
         {
