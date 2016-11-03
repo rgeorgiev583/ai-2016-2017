@@ -165,7 +165,7 @@ struct FrogsState
 int main()
 {
     unsigned int count;
-    scanf_s("%u", &count);
+    scanf("%u", &count);
 
     vector<FrogsState> visited;
     stack<FrogsState> trace;
