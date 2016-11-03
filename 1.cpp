@@ -29,7 +29,7 @@ struct FrogsState
 
     bool operator==(const FrogsState& other) const
     {
-        return Count == other.Count && Lilies == other.Lilies && BlankPos == other.BlankPos;
+        return Count == other.Count && Lilies == other.Lilies && BlankPos == other.BlankPos && Movement == other.Movement;
     }
 
     bool IsStuckJumpLeft()  const  { return BlankPos >= Lilies.size() - 1 || Lilies[BlankPos + 1] != Frog::Green; }
