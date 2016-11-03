@@ -10,9 +10,8 @@ enum class Step  { None, JumpLeft, LeapLeft, JumpRight, LeapRight };
 
 struct FrogsState
 {
-    size_t Count;
     vector<Frog> Lilies;
-    int BlankPos;
+    int Count, BlankPos;
     Step Movement;
 
     FrogsState(): Count(0), BlankPos(-1), Movement(Step::None) {}
@@ -32,10 +31,10 @@ struct FrogsState
         return Count == other.Count && Lilies == other.Lilies && BlankPos == other.BlankPos && Movement == other.Movement;
     }
 
-    bool IsStuckJumpLeft()  const  { return BlankPos >= Lilies.size() - 1 || Lilies[BlankPos + 1] != Frog::Green; }
-    bool IsStuckLeapLeft()  const  { return BlankPos >= Lilies.size() - 2 || Lilies[BlankPos + 2] != Frog::Green; }
-    bool IsStuckJumpRight() const  { return BlankPos < 1                  || Lilies[BlankPos - 1] != Frog::Brown; }
-    bool IsStuckLeapRight() const  { return BlankPos < 2                  || Lilies[BlankPos - 2] != Frog::Brown; }
+    bool IsStuckJumpLeft()  const  { return BlankPos >= (int)Lilies.size() - 1 || Lilies[BlankPos + 1] != Frog::Green; }
+    bool IsStuckLeapLeft()  const  { return BlankPos >= (int)Lilies.size() - 2 || Lilies[BlankPos + 2] != Frog::Green; }
+    bool IsStuckJumpRight() const  { return BlankPos < 1                       || Lilies[BlankPos - 1] != Frog::Brown; }
+    bool IsStuckLeapRight() const  { return BlankPos < 2                       || Lilies[BlankPos - 2] != Frog::Brown; }
 
     bool WasTargetReached() const
     {
