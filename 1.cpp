@@ -67,9 +67,10 @@ struct FrogsState
         printf("\n");
     }
 
-    bool Move(Step movement, FrogsState& moved) const
+    pair<bool, FrogsState> Move(Step movement) const
     {
-        moved = *this;
+        auto canMove = false;
+        auto moved = *this;
         moved.Movement = movement;
 
         switch (movement)
@@ -79,8 +80,7 @@ struct FrogsState
                 {
                     moved.Lilies[moved.BlankPos] = Frog::Green;
                     moved.BlankPos++;
-                    moved.Lilies[moved.BlankPos] = Frog::None;
-                    return true;
+                    canMove = true;
                 }
                 break;
 
@@ -89,8 +89,7 @@ struct FrogsState
                 {
                     moved.Lilies[moved.BlankPos] = Frog::Green;
                     moved.BlankPos += 2;
-                    moved.Lilies[moved.BlankPos] = Frog::None;
-                    return true;
+                    canMove = true;
                 }
                 break;
 
@@ -99,8 +98,7 @@ struct FrogsState
                 {
                     moved.Lilies[moved.BlankPos] = Frog::Brown;
                     moved.BlankPos--;
-                    moved.Lilies[moved.BlankPos] = Frog::None;
-                    return true;
+                    canMove = true;
                 }
                 break;
 
@@ -109,8 +107,7 @@ struct FrogsState
                 {
                     moved.Lilies[moved.BlankPos] = Frog::Brown;
                     moved.BlankPos -= 2;
-                    moved.Lilies[moved.BlankPos] = Frog::None;
-                    return true;
+                    canMove = true;
                 }
                 break;
 
@@ -118,46 +115,51 @@ struct FrogsState
                 break;
         }
 
-        return false;
+        if (canMove)
+            moved.Lilies[moved.BlankPos] = Frog::None;
+        return make_pair(canMove, moved);
     }
 
     bool UndoStep(Step prevMovement)
     {
+        auto canUndoStep = false;
+
         switch (Movement)
         {
             case Step::JumpLeft:
                 Lilies[BlankPos] = Frog::Green;
                 BlankPos--;
-                Lilies[BlankPos] = Frog::None;
-                Movement = prevMovement;
-                return true;
+                canUndoStep = true;
+                break;
 
             case Step::LeapLeft:
                 Lilies[BlankPos] = Frog::Green;
                 BlankPos -= 2;
-                Lilies[BlankPos] = Frog::None;
-                Movement = prevMovement;
-                return true;
+                canUndoStep = true;
+                break;
 
             case Step::JumpRight:
                 Lilies[BlankPos] = Frog::Brown;
                 BlankPos++;
-                Lilies[BlankPos] = Frog::None;
-                Movement = prevMovement;
-                return true;
+                canUndoStep = true;
+                break;
 
             case Step::LeapRight:
                 Lilies[BlankPos] = Frog::Brown;
                 BlankPos += 2;
-                Lilies[BlankPos] = Frog::None;
-                Movement = prevMovement;
-                return true;
+                canUndoStep = true;
+                break;
 
             default:
                 break;
         }
 
-        return false;
+        if (canUndoStep)
+        {
+            Lilies[BlankPos] = Frog::None;
+            Movement = prevMovement;
+        }
+        return canUndoStep;
     };
 };
 
@@ -178,9 +180,9 @@ int main()
 
         auto move = [&](Step movement)
         {
-            FrogsState newState;
-            if (state.Move(movement, newState))
-                trace.push(newState);
+            auto newStateOptional = state.Move(movement);
+            if (newStateOptional.first)
+                trace.push(newStateOptional.second);
         };
 
         while (!movements.empty() && state.IsStuckJumpLeft() && state.IsStuckLeapLeft() && state.IsStuckJumpRight() && state.IsStuckLeapRight())
