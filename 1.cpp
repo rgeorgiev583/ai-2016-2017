@@ -1,32 +1,54 @@
 #include <cstdio>
 #include <vector>
 #include <stack>
-#include <set>
 #include <algorithm>
 
-int main()
+using namespace std;
+
+enum class Frog  { None, Brown, Green };
+enum class Step  { None, JumpLeft, LeapLeft, JumpRight, LeapRight };
+
+struct FrogsState
 {
-    using namespace std;
+    size_t Count;
+    vector<Frog> Lilies;
+    int BlankPos;
+    Step Movement;
 
-    enum class Frog      { None, Brown, Green };
-    enum class Movement  { None, JumpLeft, LeapLeft, JumpRight, LeapRight };
-
-    unsigned int frogCount;
-    scanf("%u", &frogCount);
-
-    vector<Frog> lilies(2 * frogCount + 1);
-    lilies[frogCount] = Frog::None;
-    int blankPos = frogCount;
-
-    for (auto i = 0; i < frogCount; i++)
+    FrogsState(): Count(0), BlankPos(-1), Movement(Step::None) {}
+    FrogsState(size_t count): Count(count), Lilies(2 * Count + 1), BlankPos(Count), Movement(Step::None)
     {
-        lilies[i] = Frog::Brown;
-        lilies[2 * frogCount - i] = Frog::Green;
+        for (auto i = 0; i < Count; i++)
+        {
+            Lilies[i] = Frog::Brown;
+            Lilies[2 * Count - i] = Frog::Green;
+        }
+
+        Lilies[BlankPos] = Frog::None;
     }
 
-    auto printState = [&]
+    bool operator==(const FrogsState& other) const
     {
-        for (auto frog: lilies)
+        return Count == other.Count && Lilies == other.Lilies && BlankPos == other.BlankPos;
+    }
+
+    bool IsStuckJumpLeft()  const  { return BlankPos >= Lilies.size() - 1 || Lilies[BlankPos + 1] != Frog::Green; }
+    bool IsStuckLeapLeft()  const  { return BlankPos >= Lilies.size() - 2 || Lilies[BlankPos + 2] != Frog::Green; }
+    bool IsStuckJumpRight() const  { return BlankPos < 1                  || Lilies[BlankPos - 1] != Frog::Brown; }
+    bool IsStuckLeapRight() const  { return BlankPos < 2                  || Lilies[BlankPos - 2] != Frog::Brown; }
+
+    bool WasTargetReached() const
+    {
+        for (auto i = 0; i < Count; i++)
+            if (Lilies[i] != Frog::Green || Lilies[2 * Count - i] != Frog::Brown)
+                return false;
+
+        return Lilies[Count] == Frog::None;
+    };
+
+    void Print() const
+    {
+        for (auto frog: Lilies)
             switch (frog)
             {
                 case Frog::Brown:
@@ -43,139 +65,159 @@ int main()
             }
 
         printf("\n");
-    };
+    }
 
-    auto wasTargetReached = [&]
+    bool Move(Step movement, FrogsState& moved) const
     {
-        for (size_t i = 0; i < frogCount; i++)
-            if (lilies[i] != Frog::Green || lilies[2 * frogCount - i] != Frog::Brown)
-                return false;
+        moved = *this;
+        moved.Movement = movement;
 
-        return lilies[frogCount] == Frog::None;
-    };
-
-    set<vector<Frog> > visited;
-    stack<Movement> trace, movements;
-    trace.push(Movement::None);
-
-    while (!trace.empty() && !wasTargetReached())
-    {
-        auto undoMovement = [&](Movement movement)
+        switch (movement)
         {
-            switch (movement)
-            {
-                case Movement::JumpLeft:
-                    lilies[blankPos] = Frog::Green;
-                    blankPos--;
-                    break;
+            case Step::JumpLeft:
+                if (!IsStuckJumpLeft())
+                {
+                    moved.Lilies[moved.BlankPos] = Frog::Green;
+                    moved.BlankPos++;
+                    moved.Lilies[moved.BlankPos] = Frog::None;
+                    return true;
+                }
+                break;
 
-                case Movement::LeapLeft:
-                    lilies[blankPos] = Frog::Green;
-                    blankPos -= 2;
-                    break;
+            case Step::LeapLeft:
+                if (!IsStuckLeapLeft())
+                {
+                    moved.Lilies[moved.BlankPos] = Frog::Green;
+                    moved.BlankPos += 2;
+                    moved.Lilies[moved.BlankPos] = Frog::None;
+                    return true;
+                }
+                break;
 
-                case Movement::JumpRight:
-                    lilies[blankPos] = Frog::Brown;
-                    blankPos++;
-                    break;
+            case Step::JumpRight:
+                if (!IsStuckJumpRight())
+                {
+                    moved.Lilies[moved.BlankPos] = Frog::Brown;
+                    moved.BlankPos--;
+                    moved.Lilies[moved.BlankPos] = Frog::None;
+                    return true;
+                }
+                break;
 
-                case Movement::LeapRight:
-                    lilies[blankPos] = Frog::Brown;
-                    blankPos += 2;
-                    break;
-                
-                default:
-                    break;
-            }
+            case Step::LeapRight:
+                if (!IsStuckLeapRight())
+                {
+                    moved.Lilies[moved.BlankPos] = Frog::Brown;
+                    moved.BlankPos -= 2;
+                    moved.Lilies[moved.BlankPos] = Frog::None;
+                    return true;
+                }
+                break;
+            
+            default:
+                break;
+        }
 
-            lilies[blankPos] = Frog::None;
+        return false;
+    }
+
+    bool UndoStep(Step prevMovement)
+    {
+        switch (Movement)
+        {
+            case Step::JumpLeft:
+                Lilies[BlankPos] = Frog::Green;
+                BlankPos--;
+                Lilies[BlankPos] = Frog::None;
+                Movement = prevMovement;
+                return true;
+
+            case Step::LeapLeft:
+                Lilies[BlankPos] = Frog::Green;
+                BlankPos -= 2;
+                Lilies[BlankPos] = Frog::None;
+                Movement = prevMovement;
+                return true;
+
+            case Step::JumpRight:
+                Lilies[BlankPos] = Frog::Brown;
+                BlankPos++;
+                Lilies[BlankPos] = Frog::None;
+                Movement = prevMovement;
+                return true;
+
+            case Step::LeapRight:
+                Lilies[BlankPos] = Frog::Brown;
+                BlankPos += 2;
+                Lilies[BlankPos] = Frog::None;
+                Movement = prevMovement;
+                return true;
+            
+            default:
+                break;
+        }
+
+        return false;
+    };
+};
+
+/*
+namespace std
+{
+    template <>
+    struct hash<FrogsState>
+    {
+        size_t operator()(const FrogsState& k) const
+        {
+            return ((hash<size_t>()(k.Count) ^ (hash<vector<Frog> >()(k.Lilies) << 1)) >> 1) ^ (hash<int>()(k.BlankPos) << 1);
+        }
+    };
+};
+*/
+
+int main()
+{
+    unsigned int count;
+    scanf_s("%u", &count);
+
+    vector<FrogsState> visited;
+    stack<FrogsState> trace;
+    stack<Step> movements;
+    trace.push(FrogsState(count));
+
+    while (!trace.empty() && !trace.top().WasTargetReached())
+    {
+        auto state = trace.top();
+        trace.pop();
+
+        auto move = [&](Step movement)
+        {
+            FrogsState newState;
+            if (state.Move(movement, newState))
+                trace.push(newState);
         };
 
-        auto isStuckJumpLeft  = [&] { return blankPos >= lilies.size() - 1 || lilies[blankPos + 1] != Frog::Green; };
-        auto isStuckLeapLeft  = [&] { return blankPos >= lilies.size() - 2 || lilies[blankPos + 2] != Frog::Green; };
-        auto isStuckJumpRight = [&] { return blankPos < 1 || lilies[blankPos - 1] != Frog::Brown; };
-        auto isStuckLeapRight = [&] { return blankPos < 2 || lilies[blankPos - 2] != Frog::Brown; };
-
-        while (!movements.empty() && isStuckJumpLeft() && isStuckLeapLeft() && isStuckLeapLeft() && isStuckLeapRight())
+        while (!movements.empty() && state.IsStuckJumpLeft() && state.IsStuckLeapLeft() && state.IsStuckJumpRight() && state.IsStuckLeapRight())
         {
-            undoMovement(movements.top());
+            state.UndoStep(movements.top());
             movements.pop();
         }
 
-        auto movement = trace.top();
-        trace.pop();
-
-        auto canMove = true;
-
-        if (lilies[blankPos] == Frog::None)
-            switch (movement)
-            {
-                case Movement::JumpLeft:
-                    if (isStuckJumpLeft())
-                        canMove = false;
-                    else
-                    {
-                        lilies[blankPos] = Frog::Green;
-                        blankPos++;
-                    }
-                    break;
-
-                case Movement::LeapLeft:
-                    if (isStuckLeapLeft())
-                        canMove = false;
-                    else
-                    {
-                        lilies[blankPos] = Frog::Green;
-                        blankPos += 2;
-                    }
-                    break;
-
-                case Movement::JumpRight:
-                    if (isStuckJumpRight())
-                        canMove = false;
-                    else
-                    {
-                        lilies[blankPos] = Frog::Brown;
-                        blankPos--;
-                    }
-                    break;
-
-                case Movement::LeapRight:
-                    if (isStuckLeapRight())
-                        canMove = false;
-                    else
-                    {
-                        lilies[blankPos] = Frog::Brown;
-                        blankPos -= 2;
-                    }
-                    break;
-                
-                default:
-                    break;
-            }
-        else
-            canMove = false;
-
-        if (canMove)
+        if (visited.end() == find(visited.begin(), visited.end(), state))
         {
-            lilies[blankPos] = Frog::None;
+            visited.push_back(state);
+            movements.push(state.Movement);
+            move(Step::JumpLeft);
+            move(Step::LeapLeft);
+            move(Step::JumpRight);
+            move(Step::LeapRight);
 
-            if (!visited.count(lilies))
-            {
-                visited.insert(lilies);
-                movements.push(movement);
-
-                trace.push(Movement::JumpLeft);
-                trace.push(Movement::LeapLeft);
-                trace.push(Movement::JumpRight);
-                trace.push(Movement::LeapRight);
-            }
-            //else
-                //undoMovement(movement);
-
-            printState();
+            state.Print();
         }
     }
+
+    if (!trace.empty())
+        trace.top().Print();
 
     return 0;
 }
