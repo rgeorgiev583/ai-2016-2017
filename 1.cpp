@@ -191,7 +191,7 @@ int main()
             movements.pop();
         }
 
-        if (visited.end() == find(visited.begin(), visited.end(), state))
+        if (visited.crend() == find(visited.crbegin(), visited.crend(), state))
         {
             visited.push_back(state);
             movements.push(state.Movement);
