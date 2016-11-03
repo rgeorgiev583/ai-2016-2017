@@ -17,7 +17,7 @@ struct FrogsState
     FrogsState(): Count(0), BlankPos(-1), Movement(Step::None) {}
     FrogsState(size_t count): Lilies(2 * count + 1), Count(count), BlankPos(count), Movement(Step::None)
     {
-        for (auto i = 0; i < Count; i++)
+        for (auto i = 0; i < Count; ++i)
         {
             Lilies[i] = Frog::Brown;
             Lilies[2 * Count - i] = Frog::Green;
@@ -38,7 +38,7 @@ struct FrogsState
 
     bool WasTargetReached() const
     {
-        for (auto i = 0; i < Count; i++)
+        for (auto i = 0; i < Count; ++i)
             if (Lilies[i] != Frog::Green || Lilies[2 * Count - i] != Frog::Brown)
                 return false;
 
