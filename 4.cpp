@@ -38,7 +38,7 @@ namespace Knapsack
         {
             data = new long long*[rows];
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < rows; ++i)
                 data[i] = new long long[cols];
         }
         IntMatrix(const IntMatrix& other): data(nullptr)
@@ -77,8 +77,8 @@ namespace Knapsack
         int n = items.size();
         IntMatrix knapsack(n+1, maxWeight + 1);
 
-        for (int i = 0; i <= n; i++)
-            for (long long j = 0; j <= maxWeight; j++)
+        for (int i = 0; i <= n; ++i)
+            for (long long j = 0; j <= maxWeight; ++j)
                 if (i == 0 || j == 0)
                     knapsack[i][j] = 0;
                 else if (items[i-1].Weight <= j)
@@ -92,22 +92,22 @@ namespace Knapsack
 
 int main()
 {
-    long long M;
-    scanf("%d", &M);
-    int N;
-    scanf("%d", &N);
+    long long m;
+    scanf("%d", &m);
+    int n;
+    scanf("%d", &n);
 
-    if (M < 0 || N < 0)
+    if (m < 0 || n < 0)
         return 1;
 
-    std::vector<Knapsack::Item> items(N);
+    std::vector<Knapsack::Item> items(n);
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < n; ++i)
     {
         scanf("%d", &items[i].Value);
         scanf("%d", &items[i].Weight);
     }
 
-    printf("%d\n", Knapsack::Solve(M, items));
+    printf("%d\n", Knapsack::Solve(m, items));
     return 0;
 }

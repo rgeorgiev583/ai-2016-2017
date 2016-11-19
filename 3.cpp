@@ -22,10 +22,10 @@ namespace NQueens
         {
             int n = rows.size();
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < n; ++i)
                 rows[i] = i;
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < n; ++i)
             {
                 int j = generator() % n;
                 std::swap(rows[i], rows[j]);
@@ -36,7 +36,7 @@ namespace NQueens
         {
             int count = 0, n = rows.size();
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < n; ++i)
                 if (i != col)
                 {
                     int j = rows[i];
@@ -56,7 +56,7 @@ namespace NQueens
             {
                 int maxConflicts = 0;
                 candidates.clear();
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < n; ++i)
                 {
                     int conflictCount = GetConflictCount(rows[i], i);
                     if (conflictCount == maxConflicts)
@@ -76,7 +76,7 @@ namespace NQueens
 
                 int minConflictCount = rows.size();
                 candidates.clear();
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < n; ++i)
                 {
                     int conflictCount = GetConflictCount(i, worstQueenColumn);
                     if (conflictCount == minConflictCount)
@@ -104,9 +104,9 @@ namespace NQueens
         void Print() const
         {
             int n = rows.size();
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < n; ++i)
             {
-                for (int j = 0; j < n; j++)
+                for (int j = 0; j < n; ++j)
                     printf(rows[j] == i ? "*" : "_");
 
                 printf("\n");
