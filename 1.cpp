@@ -47,7 +47,7 @@ namespace Frogs
 
         void Print() const
         {
-            for (auto frog: Lilies)
+            for (const auto& frog: Lilies)
                 switch (frog)
                 {
                     case Frog::Brown:
