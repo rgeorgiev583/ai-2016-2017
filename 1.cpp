@@ -2,6 +2,7 @@
 #include <vector>
 #include <stack>
 #include <algorithm>
+#include <memory>
 
 namespace Frogs
 {
@@ -66,7 +67,7 @@ namespace Frogs
             printf("\n");
         }
 
-        std::pair<bool, State> Move(Step movement) const
+        std::shared_ptr<State> Move(Step movement) const
         {
             auto canMove = false;
             auto moved = *this;
@@ -116,36 +117,37 @@ namespace Frogs
 
             if (canMove)
                 moved.Lilies[moved.BlankPos] = Frog::None;
-            return std::make_pair(canMove, moved);
+            return canMove ? std::make_shared<State>(moved) : nullptr;
         }
 
-        bool UndoStep(Step prevMovement)
+        std::shared_ptr<State> UndoStep(Step prevMovement) const
         {
             auto canUndoStep = false;
+            auto undone = *this;
 
             switch (Movement)
             {
                 case Step::JumpLeft:
-                    Lilies[BlankPos] = Frog::Green;
-                    BlankPos--;
+                    undone.Lilies[BlankPos] = Frog::Green;
+                    undone.BlankPos--;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapLeft:
-                    Lilies[BlankPos] = Frog::Green;
-                    BlankPos -= 2;
+                    undone.Lilies[BlankPos] = Frog::Green;
+                    undone.BlankPos -= 2;
                     canUndoStep = true;
                     break;
 
                 case Step::JumpRight:
-                    Lilies[BlankPos] = Frog::Brown;
-                    BlankPos++;
+                    undone.Lilies[BlankPos] = Frog::Brown;
+                    undone.BlankPos++;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapRight:
-                    Lilies[BlankPos] = Frog::Brown;
-                    BlankPos += 2;
+                    undone.Lilies[BlankPos] = Frog::Brown;
+                    undone.BlankPos += 2;
                     canUndoStep = true;
                     break;
 
@@ -155,10 +157,10 @@ namespace Frogs
 
             if (canUndoStep)
             {
-                Lilies[BlankPos] = Frog::None;
-                Movement = prevMovement;
+                undone.Lilies[BlankPos] = Frog::None;
+                undone.Movement = prevMovement;
             }
-            return canUndoStep;
+            return canUndoStep ? std::make_shared<State>(undone) : nullptr;
         };
     };
 }
@@ -171,44 +173,47 @@ int main()
     if (count < 0)
         return 1;
 
-    std::vector<Frogs::State> visited;
-    std::stack<Frogs::State> trace;
+    std::vector<std::shared_ptr<Frogs::State> > visited;
+    std::stack<std::shared_ptr<Frogs::State> > trace;
     std::stack<Frogs::Step> movements;
-    trace.push(Frogs::State(count));
+    trace.push(std::make_shared<Frogs::State>(count));
 
-    while (!trace.empty() && !trace.top().WasTargetReached())
+    while (!trace.empty() && !trace.top()->WasTargetReached())
     {
         auto state = trace.top();
         trace.pop();
 
         auto move = [&](Frogs::Step movement)
         {
-            auto newStateOptional = state.Move(movement);
-            if (newStateOptional.first)
-                trace.push(newStateOptional.second);
+            auto newState = state->Move(movement);
+            if (newState)
+                trace.push(newState);
         };
 
-        while (!movements.empty() && state.IsStuckJumpLeft() && state.IsStuckLeapLeft() && state.IsStuckJumpRight() && state.IsStuckLeapRight())
+        while (!movements.empty() && state && state->IsStuckJumpLeft() && state->IsStuckLeapLeft() && state->IsStuckJumpRight() && state->IsStuckLeapRight())
         {
-            state.UndoStep(movements.top());
+            state = state->UndoStep(movements.top());
             movements.pop();
         }
+
+        if (!state)
+            continue;
 
         if (std::find(visited.crbegin(), visited.crend(), state) == visited.crend())
         {
             visited.push_back(state);
-            movements.push(state.Movement);
+            movements.push(state->Movement);
             move(Frogs::Step::JumpLeft);
             move(Frogs::Step::LeapLeft);
             move(Frogs::Step::JumpRight);
             move(Frogs::Step::LeapRight);
 
-            state.Print();
+            state->Print();
         }
     }
 
     if (!trace.empty())
-        trace.top().Print();
+        trace.top()->Print();
 
     return 0;
 }
