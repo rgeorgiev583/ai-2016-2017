@@ -15,7 +15,7 @@ namespace Frogs
         int Count, BlankPos;
         Step Movement;
 
-        State(): Count(0), BlankPos(-1), Movement(Step::None) {}
+        State(): Count(0), BlankPos(-1), Movement(Step::None)  { }
         State(int count): Lilies(2 * count + 1), Count(count), BlankPos(count), Movement(Step::None)
         {
             for (int i = 0; i < Count; ++i)
@@ -69,7 +69,7 @@ namespace Frogs
 
         std::shared_ptr<State> Move(Step movement) const
         {
-            auto canMove = false;
+            bool canMove = false;
             auto moved = *this;
             moved.Movement = movement;
 
@@ -122,7 +122,7 @@ namespace Frogs
 
         std::shared_ptr<State> UndoStep(Step prevMovement) const
         {
-            auto canUndoStep = false;
+            bool canUndoStep = false;
             auto undone = *this;
 
             switch (Movement)
