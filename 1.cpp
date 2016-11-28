@@ -19,7 +19,6 @@ namespace Frogs
         State(): count(0), blankPos(-1), movement(Step::None)
         {
         }
-
         State(int count): lilies(2 * count + 1), count(count), blankPos(count), movement(Step::None)
         {
             for (int i = 0; i < count; ++i)
@@ -31,12 +30,12 @@ namespace Frogs
             lilies[blankPos] = Frog::None;
         }
 
+        Step GetMovement()      const  { return movement; }
+
         bool operator==(const State& other) const
         {
             return count == other.count && lilies == other.lilies && blankPos == other.blankPos && movement == other.movement;
         }
-
-        Step GetMovement()      const  { return movement; }
 
         bool IsStuckJumpLeft()  const  { return blankPos >= (int)lilies.size() - 1 || lilies[blankPos + 1] != Frog::Green; }
         bool IsStuckLeapLeft()  const  { return blankPos >= (int)lilies.size() - 2 || lilies[blankPos + 2] != Frog::Green; }
@@ -50,27 +49,6 @@ namespace Frogs
                     return false;
 
             return lilies[count] == Frog::None;
-        };
-
-        void Print() const
-        {
-            for (const auto& frog: lilies)
-                switch (frog)
-                {
-                    case Frog::Brown:
-                        printf(">");
-                        break;
-
-                    case Frog::Green:
-                        printf("<");
-                        break;
-
-                    case Frog::None:
-                        printf(" ");
-                        break;
-                }
-
-            printf("\n");
         }
 
         std::shared_ptr<State> Move(Step movement) const
@@ -125,7 +103,6 @@ namespace Frogs
                 moved->lilies[moved->blankPos] = Frog::None;
             return canMove ? moved : nullptr;
         }
-
         std::shared_ptr<State> UndoStep(Step prevMovement) const
         {
             bool canUndoStep = false;
@@ -167,7 +144,28 @@ namespace Frogs
                 undone->movement = prevMovement;
             }
             return canUndoStep ? undone : nullptr;
-        };
+        }
+
+        void Print() const
+        {
+            for (const auto& frog: lilies)
+                switch (frog)
+                {
+                    case Frog::Brown:
+                        printf(">");
+                        break;
+
+                    case Frog::Green:
+                        printf("<");
+                        break;
+
+                    case Frog::None:
+                        printf(" ");
+                        break;
+                }
+
+            printf("\n");
+        }
     };
 }
 
