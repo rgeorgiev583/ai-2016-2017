@@ -12,7 +12,6 @@ namespace NQueens
         std::vector<int> rows;
 
     public:
-        Board()  { }
         Board(unsigned seed, int n): generator(seed), rows(n)
         {
             Refill();
