@@ -11,6 +11,21 @@ namespace NQueens
         std::default_random_engine generator;
         std::vector<int> rows;
 
+        int getConflictCount(int row, int col) const
+        {
+            int count = 0, n = rows.size();
+
+            for (int i = 0; i < n; ++i)
+                if (i != col)
+                {
+                    int j = rows[i];
+                    if (j == row || abs(j - row) == abs(i - col))
+                        count++;
+                }
+
+            return count;
+        }
+
     public:
         Board(unsigned seed, int n): generator(seed), rows(n)
         {
@@ -31,21 +46,6 @@ namespace NQueens
             }
         }
 
-        int GetConflictCount(int row, int col) const
-        {
-            int count = 0, n = rows.size();
-
-            for (int i = 0; i < n; ++i)
-                if (i != col)
-                {
-                    int j = rows[i];
-                    if (j == row || abs(j - row) == abs(i - col))
-                        count++;
-                }
-
-            return count;
-        }
-
         void Solve()
         {
             int moveCount = 0, n = rows.size();
@@ -57,7 +57,7 @@ namespace NQueens
                 candidates.clear();
                 for (int i = 0; i < n; ++i)
                 {
-                    int conflictCount = GetConflictCount(rows[i], i);
+                    int conflictCount = getConflictCount(rows[i], i);
                     if (conflictCount == maxConflicts)
                         candidates.push_back(i);
                     else if (conflictCount > maxConflicts)
@@ -77,7 +77,7 @@ namespace NQueens
                 candidates.clear();
                 for (int i = 0; i < n; ++i)
                 {
-                    int conflictCount = GetConflictCount(i, worstQueenColumn);
+                    int conflictCount = getConflictCount(i, worstQueenColumn);
                     if (conflictCount == minConflictCount)
                         candidates.push_back(i);
                     else if (conflictCount < minConflictCount)
