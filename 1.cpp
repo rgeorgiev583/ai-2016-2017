@@ -9,12 +9,13 @@ namespace Frogs
     enum class Frog  { None, Brown, Green };
     enum class Step  { None, JumpLeft, LeapLeft, JumpRight, LeapRight };
 
-    struct State
+    class State
     {
         std::vector<Frog> Lilies;
         int Count, BlankPos;
         Step Movement;
 
+    public:
         State(): Count(0), BlankPos(-1), Movement(Step::None)  { }
         State(int count): Lilies(2 * count + 1), Count(count), BlankPos(count), Movement(Step::None)
         {
@@ -31,6 +32,8 @@ namespace Frogs
         {
             return Count == other.Count && Lilies == other.Lilies && BlankPos == other.BlankPos && Movement == other.Movement;
         }
+
+        Step GetMovement()      const  { return Movement; }
 
         bool IsStuckJumpLeft()  const  { return BlankPos >= (int)Lilies.size() - 1 || Lilies[BlankPos + 1] != Frog::Green; }
         bool IsStuckLeapLeft()  const  { return BlankPos >= (int)Lilies.size() - 2 || Lilies[BlankPos + 2] != Frog::Green; }
@@ -202,7 +205,7 @@ int main()
         if (std::find(visited.crbegin(), visited.crend(), state) == visited.crend())
         {
             visited.push_back(state);
-            movements.push(state->Movement);
+            movements.push(state->GetMovement());
             move(Frogs::Step::JumpLeft);
             move(Frogs::Step::LeapLeft);
             move(Frogs::Step::JumpRight);
