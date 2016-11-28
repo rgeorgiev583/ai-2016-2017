@@ -30,6 +30,7 @@ namespace Knapsack
                 delete data[i];
 
             delete data;
+            data = nullptr;
         }
 
     public:
