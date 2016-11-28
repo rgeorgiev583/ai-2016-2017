@@ -16,7 +16,10 @@ namespace Frogs
         Step movement;
 
     public:
-        State(): count(0), blankPos(-1), movement(Step::None)  { }
+        State(): count(0), blankPos(-1), movement(Step::None)
+        {
+        }
+
         State(int count): lilies(2 * count + 1), count(count), blankPos(count), movement(Step::None)
         {
             for (int i = 0; i < count; ++i)
