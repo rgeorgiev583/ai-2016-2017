@@ -60,9 +60,6 @@ namespace Knapsack
             destroy();
         }
 
-        int Rows() const        { return rows; }
-        long long Cols() const  { return cols; }
-
         const long long* operator[](int i) const  { return data[i]; }
         long long* operator[](int i)              { return data[i]; }
     };
