@@ -70,16 +70,16 @@ namespace Frogs
         std::shared_ptr<State> Move(Step movement) const
         {
             bool canMove = false;
-            auto moved = *this;
-            moved.Movement = movement;
+            auto moved = std::make_shared<State>(*this);
+            moved->Movement = movement;
 
             switch (movement)
             {
                 case Step::JumpLeft:
                     if (!IsStuckJumpLeft())
                     {
-                        moved.Lilies[moved.BlankPos] = Frog::Green;
-                        moved.BlankPos++;
+                        moved->Lilies[moved->BlankPos] = Frog::Green;
+                        moved->BlankPos++;
                         canMove = true;
                     }
                     break;
@@ -87,8 +87,8 @@ namespace Frogs
                 case Step::LeapLeft:
                     if (!IsStuckLeapLeft())
                     {
-                        moved.Lilies[moved.BlankPos] = Frog::Green;
-                        moved.BlankPos += 2;
+                        moved->Lilies[moved->BlankPos] = Frog::Green;
+                        moved->BlankPos += 2;
                         canMove = true;
                     }
                     break;
@@ -96,8 +96,8 @@ namespace Frogs
                 case Step::JumpRight:
                     if (!IsStuckJumpRight())
                     {
-                        moved.Lilies[moved.BlankPos] = Frog::Brown;
-                        moved.BlankPos--;
+                        moved->Lilies[moved->BlankPos] = Frog::Brown;
+                        moved->BlankPos--;
                         canMove = true;
                     }
                     break;
@@ -105,8 +105,8 @@ namespace Frogs
                 case Step::LeapRight:
                     if (!IsStuckLeapRight())
                     {
-                        moved.Lilies[moved.BlankPos] = Frog::Brown;
-                        moved.BlankPos -= 2;
+                        moved->Lilies[moved->BlankPos] = Frog::Brown;
+                        moved->BlankPos -= 2;
                         canMove = true;
                     }
                     break;
@@ -116,38 +116,38 @@ namespace Frogs
             }
 
             if (canMove)
-                moved.Lilies[moved.BlankPos] = Frog::None;
-            return canMove ? std::make_shared<State>(moved) : nullptr;
+                moved->Lilies[moved->BlankPos] = Frog::None;
+            return canMove ? moved : nullptr;
         }
 
         std::shared_ptr<State> UndoStep(Step prevMovement) const
         {
             bool canUndoStep = false;
-            auto undone = *this;
+            auto undone = std::make_shared<State>(*this);
 
             switch (Movement)
             {
                 case Step::JumpLeft:
-                    undone.Lilies[BlankPos] = Frog::Green;
-                    undone.BlankPos--;
+                    undone->Lilies[BlankPos] = Frog::Green;
+                    undone->BlankPos--;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapLeft:
-                    undone.Lilies[BlankPos] = Frog::Green;
-                    undone.BlankPos -= 2;
+                    undone->Lilies[BlankPos] = Frog::Green;
+                    undone->BlankPos -= 2;
                     canUndoStep = true;
                     break;
 
                 case Step::JumpRight:
-                    undone.Lilies[BlankPos] = Frog::Brown;
-                    undone.BlankPos++;
+                    undone->Lilies[BlankPos] = Frog::Brown;
+                    undone->BlankPos++;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapRight:
-                    undone.Lilies[BlankPos] = Frog::Brown;
-                    undone.BlankPos += 2;
+                    undone->Lilies[BlankPos] = Frog::Brown;
+                    undone->BlankPos += 2;
                     canUndoStep = true;
                     break;
 
@@ -157,10 +157,10 @@ namespace Frogs
 
             if (canUndoStep)
             {
-                undone.Lilies[BlankPos] = Frog::None;
-                undone.Movement = prevMovement;
+                undone->Lilies[BlankPos] = Frog::None;
+                undone->Movement = prevMovement;
             }
-            return canUndoStep ? std::make_shared<State>(undone) : nullptr;
+            return canUndoStep ? undone : nullptr;
         };
     };
 }
