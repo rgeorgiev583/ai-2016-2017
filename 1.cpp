@@ -11,47 +11,47 @@ namespace Frogs
 
     class State
     {
-        std::vector<Frog> Lilies;
-        int Count, BlankPos;
-        Step Movement;
+        std::vector<Frog> lilies;
+        int count, blankPos;
+        Step movement;
 
     public:
-        State(): Count(0), BlankPos(-1), Movement(Step::None)  { }
-        State(int count): Lilies(2 * count + 1), Count(count), BlankPos(count), Movement(Step::None)
+        State(): count(0), blankPos(-1), movement(Step::None)  { }
+        State(int count): lilies(2 * count + 1), count(count), blankPos(count), movement(Step::None)
         {
-            for (int i = 0; i < Count; ++i)
+            for (int i = 0; i < count; ++i)
             {
-                Lilies[i] = Frog::Brown;
-                Lilies[2 * Count - i] = Frog::Green;
+                lilies[i] = Frog::Brown;
+                lilies[2 * count - i] = Frog::Green;
             }
 
-            Lilies[BlankPos] = Frog::None;
+            lilies[blankPos] = Frog::None;
         }
 
         bool operator==(const State& other) const
         {
-            return Count == other.Count && Lilies == other.Lilies && BlankPos == other.BlankPos && Movement == other.Movement;
+            return count == other.count && lilies == other.lilies && blankPos == other.blankPos && movement == other.movement;
         }
 
-        Step GetMovement()      const  { return Movement; }
+        Step GetMovement()      const  { return movement; }
 
-        bool IsStuckJumpLeft()  const  { return BlankPos >= (int)Lilies.size() - 1 || Lilies[BlankPos + 1] != Frog::Green; }
-        bool IsStuckLeapLeft()  const  { return BlankPos >= (int)Lilies.size() - 2 || Lilies[BlankPos + 2] != Frog::Green; }
-        bool IsStuckJumpRight() const  { return BlankPos < 1                       || Lilies[BlankPos - 1] != Frog::Brown; }
-        bool IsStuckLeapRight() const  { return BlankPos < 2                       || Lilies[BlankPos - 2] != Frog::Brown; }
+        bool IsStuckJumpLeft()  const  { return blankPos >= (int)lilies.size() - 1 || lilies[blankPos + 1] != Frog::Green; }
+        bool IsStuckLeapLeft()  const  { return blankPos >= (int)lilies.size() - 2 || lilies[blankPos + 2] != Frog::Green; }
+        bool IsStuckJumpRight() const  { return blankPos < 1                       || lilies[blankPos - 1] != Frog::Brown; }
+        bool IsStuckLeapRight() const  { return blankPos < 2                       || lilies[blankPos - 2] != Frog::Brown; }
 
         bool WasTargetReached() const
         {
-            for (int i = 0; i < Count; ++i)
-                if (Lilies[i] != Frog::Green || Lilies[2 * Count - i] != Frog::Brown)
+            for (int i = 0; i < count; ++i)
+                if (lilies[i] != Frog::Green || lilies[2 * count - i] != Frog::Brown)
                     return false;
 
-            return Lilies[Count] == Frog::None;
+            return lilies[count] == Frog::None;
         };
 
         void Print() const
         {
-            for (const auto& frog: Lilies)
+            for (const auto& frog: lilies)
                 switch (frog)
                 {
                     case Frog::Brown:
@@ -74,15 +74,15 @@ namespace Frogs
         {
             bool canMove = false;
             auto moved = std::make_shared<State>(*this);
-            moved->Movement = movement;
+            moved->movement = movement;
 
             switch (movement)
             {
                 case Step::JumpLeft:
                     if (!IsStuckJumpLeft())
                     {
-                        moved->Lilies[moved->BlankPos] = Frog::Green;
-                        moved->BlankPos++;
+                        moved->lilies[moved->blankPos] = Frog::Green;
+                        moved->blankPos++;
                         canMove = true;
                     }
                     break;
@@ -90,8 +90,8 @@ namespace Frogs
                 case Step::LeapLeft:
                     if (!IsStuckLeapLeft())
                     {
-                        moved->Lilies[moved->BlankPos] = Frog::Green;
-                        moved->BlankPos += 2;
+                        moved->lilies[moved->blankPos] = Frog::Green;
+                        moved->blankPos += 2;
                         canMove = true;
                     }
                     break;
@@ -99,8 +99,8 @@ namespace Frogs
                 case Step::JumpRight:
                     if (!IsStuckJumpRight())
                     {
-                        moved->Lilies[moved->BlankPos] = Frog::Brown;
-                        moved->BlankPos--;
+                        moved->lilies[moved->blankPos] = Frog::Brown;
+                        moved->blankPos--;
                         canMove = true;
                     }
                     break;
@@ -108,8 +108,8 @@ namespace Frogs
                 case Step::LeapRight:
                     if (!IsStuckLeapRight())
                     {
-                        moved->Lilies[moved->BlankPos] = Frog::Brown;
-                        moved->BlankPos -= 2;
+                        moved->lilies[moved->blankPos] = Frog::Brown;
+                        moved->blankPos -= 2;
                         canMove = true;
                     }
                     break;
@@ -119,7 +119,7 @@ namespace Frogs
             }
 
             if (canMove)
-                moved->Lilies[moved->BlankPos] = Frog::None;
+                moved->lilies[moved->blankPos] = Frog::None;
             return canMove ? moved : nullptr;
         }
 
@@ -128,29 +128,29 @@ namespace Frogs
             bool canUndoStep = false;
             auto undone = std::make_shared<State>(*this);
 
-            switch (Movement)
+            switch (movement)
             {
                 case Step::JumpLeft:
-                    undone->Lilies[BlankPos] = Frog::Green;
-                    undone->BlankPos--;
+                    undone->lilies[blankPos] = Frog::Green;
+                    undone->blankPos--;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapLeft:
-                    undone->Lilies[BlankPos] = Frog::Green;
-                    undone->BlankPos -= 2;
+                    undone->lilies[blankPos] = Frog::Green;
+                    undone->blankPos -= 2;
                     canUndoStep = true;
                     break;
 
                 case Step::JumpRight:
-                    undone->Lilies[BlankPos] = Frog::Brown;
-                    undone->BlankPos++;
+                    undone->lilies[blankPos] = Frog::Brown;
+                    undone->blankPos++;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapRight:
-                    undone->Lilies[BlankPos] = Frog::Brown;
-                    undone->BlankPos += 2;
+                    undone->lilies[blankPos] = Frog::Brown;
+                    undone->blankPos += 2;
                     canUndoStep = true;
                     break;
 
@@ -160,8 +160,8 @@ namespace Frogs
 
             if (canUndoStep)
             {
-                undone->Lilies[BlankPos] = Frog::None;
-                undone->Movement = prevMovement;
+                undone->lilies[blankPos] = Frog::None;
+                undone->movement = prevMovement;
             }
             return canUndoStep ? undone : nullptr;
         };
