@@ -4,6 +4,7 @@
 #include <random>
 #include <chrono>
 
+
 namespace NQueens
 {
     class Board

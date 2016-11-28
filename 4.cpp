@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <vector>
 
+
 namespace Knapsack
 {
     class IntMatrix

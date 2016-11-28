@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <memory>
 
+
 namespace Frogs
 {
     enum class Frog  { None, Brown, Green };
