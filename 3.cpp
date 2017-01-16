@@ -59,41 +59,36 @@ namespace NQueens
                 for (int i = 0; i < n; ++i)
                 {
                     int conflictCount = getConflictCount(rows[i], i);
-                    if (conflictCount == maxConflicts)
-                        candidates.push_back(i);
-                    else if (conflictCount > maxConflicts)
+                    if (conflictCount > maxConflicts)
                     {
                         maxConflicts = conflictCount;
                         candidates.clear();
-                        candidates.push_back(i);
                     }
+                    candidates.push_back(i);
                 }
 
                 if (maxConflicts == 0)
                     return;
 
                 int worstQueenColumn = candidates[generator() % candidates.size()];
-
                 int minConflictCount = rows.size();
                 candidates.clear();
                 for (int i = 0; i < n; ++i)
                 {
                     int conflictCount = getConflictCount(i, worstQueenColumn);
-                    if (conflictCount == minConflictCount)
-                        candidates.push_back(i);
-                    else if (conflictCount < minConflictCount)
+                    if (conflictCount < minConflictCount)
                     {
                         minConflictCount = conflictCount;
                         candidates.clear();
-                        candidates.push_back(i);
                     }
+                    candidates.push_back(i);
                 }
 
                 if (!candidates.empty())
                     rows[worstQueenColumn] = candidates[generator() % candidates.size()];
 
-                moveCount++;
-                if (moveCount == n * 2)
+                ++moveCount;
+                if (2 * n == moveCount)
                 {
                     Refill();
                     moveCount = 0;
