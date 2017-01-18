@@ -103,10 +103,10 @@ int main()
 
     std::vector<Knapsack::Item> items(n);
 
-    for (int i = 0; i < n; ++i)
+    for (auto& item: items)
     {
-        scanf("%d", &items[i].Value);
-        scanf("%d", &items[i].Weight);
+        scanf("%d", &item.Value);
+        scanf("%d", &item.Weight);
     }
 
     printf("%d\n", Knapsack::Solve(m, items));
