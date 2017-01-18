@@ -19,7 +19,7 @@ namespace SlidingBlocks
     {
         StatePtr State;
         NodePtr Parent;
-        int G, H;
+        int Cost, TotalCost;
 
         Node(StatePtr state, NodePtr parent = nullptr);
 

@@ -9,13 +9,13 @@
 
 
 SlidingBlocks::Node::Node(SlidingBlocks::StatePtr state, SlidingBlocks::NodePtr parent):
-        State(state), Parent(parent), G(0), H(0)
+        State(state), Parent(parent), Cost(0), TotalCost(0)
 {
 }
 
 bool SlidingBlocks::Node::operator<(const SlidingBlocks::Node& other)
 {
-    return H < other.H;
+    return TotalCost < other.TotalCost;
 }
 
 std::vector<SlidingBlocks::StatePtr> SlidingBlocks::FindPath(const SlidingBlocks::State& source, const SlidingBlocks::State& target, SlidingBlocks::HeuristicFunction heuristic)
@@ -24,7 +24,7 @@ std::vector<SlidingBlocks::StatePtr> SlidingBlocks::FindPath(const SlidingBlocks
     std::vector<NodePtr> closedSet;
     NodePtr currentNode = nullptr;
     auto sourceNode = std::make_shared<Node>(std::make_shared<State>(source));
-    sourceNode->H = heuristic(source, target);
+    sourceNode->TotalCost = heuristic(source, target);
     openSet.push_back(sourceNode);
 
     while (!openSet.empty())
@@ -51,7 +51,7 @@ std::vector<SlidingBlocks::StatePtr> SlidingBlocks::FindPath(const SlidingBlocks
             if (closedSet.end() != std::find_if(closedSet.begin(), closedSet.end(), checkIfIsEqualToNeighbor))
                 return;
 
-            int totalCost = currentNode->G + ManhattanDistance(*currentNode->State, *neighbor);
+            int tentativeCost = currentNode->Cost + ManhattanDistance(*currentNode->State, *neighbor);
             auto successorPos = std::find_if(openSet.begin(), openSet.end(), checkIfIsEqualToNeighbor);
             NodePtr successor;
             if (openSet.end() == successorPos)
@@ -62,13 +62,13 @@ std::vector<SlidingBlocks::StatePtr> SlidingBlocks::FindPath(const SlidingBlocks
             else
             {
                 successor = *successorPos;
-                if (totalCost >= successor->G)
+                if (tentativeCost >= successor->Cost)
                     return;
             }
 
             successor->Parent = currentNode;
-            successor->G = totalCost;
-            successor->H = successor->G + heuristic(*neighbor, target);
+            successor->Cost = tentativeCost;
+            successor->TotalCost = successor->Cost + heuristic(*neighbor, target);
         };
 
         move(Step::Left);
