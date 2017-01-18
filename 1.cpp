@@ -61,7 +61,7 @@ namespace Frogs
             switch (movement)
             {
                 case Step::JumpLeft:
-                    if (!IsStuckJumpLeft())
+                    if (!moved->IsStuckJumpLeft())
                     {
                         moved->lilies[moved->blankPos] = Frog::Green;
                         moved->blankPos++;
@@ -70,7 +70,7 @@ namespace Frogs
                     break;
 
                 case Step::LeapLeft:
-                    if (!IsStuckLeapLeft())
+                    if (!moved->IsStuckLeapLeft())
                     {
                         moved->lilies[moved->blankPos] = Frog::Green;
                         moved->blankPos += 2;
@@ -79,7 +79,7 @@ namespace Frogs
                     break;
 
                 case Step::JumpRight:
-                    if (!IsStuckJumpRight())
+                    if (!moved->IsStuckJumpRight())
                     {
                         moved->lilies[moved->blankPos] = Frog::Brown;
                         moved->blankPos--;
@@ -88,7 +88,7 @@ namespace Frogs
                     break;
 
                 case Step::LeapRight:
-                    if (!IsStuckLeapRight())
+                    if (!moved->IsStuckLeapRight())
                     {
                         moved->lilies[moved->blankPos] = Frog::Brown;
                         moved->blankPos -= 2;
@@ -109,28 +109,28 @@ namespace Frogs
             bool canUndoStep = false;
             auto undone = std::make_shared<State>(*this);
 
-            switch (movement)
+            switch (undone->movement)
             {
                 case Step::JumpLeft:
-                    undone->lilies[blankPos] = Frog::Green;
+                    undone->lilies[undone->blankPos] = Frog::Green;
                     undone->blankPos--;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapLeft:
-                    undone->lilies[blankPos] = Frog::Green;
+                    undone->lilies[undone->blankPos] = Frog::Green;
                     undone->blankPos -= 2;
                     canUndoStep = true;
                     break;
 
                 case Step::JumpRight:
-                    undone->lilies[blankPos] = Frog::Brown;
+                    undone->lilies[undone->blankPos] = Frog::Brown;
                     undone->blankPos++;
                     canUndoStep = true;
                     break;
 
                 case Step::LeapRight:
-                    undone->lilies[blankPos] = Frog::Brown;
+                    undone->lilies[undone->blankPos] = Frog::Brown;
                     undone->blankPos += 2;
                     canUndoStep = true;
                     break;
@@ -204,7 +204,7 @@ int main()
         if (!state)
             continue;
 
-        if (std::find(visited.crbegin(), visited.crend(), state) == visited.crend())
+        if (visited.crend() == std::find(visited.crbegin(), visited.crend(), state))
         {
             visited.push_back(state);
             movements.push(state->GetMovement());
