@@ -119,7 +119,7 @@ namespace Frogs
                         break;
 
                     case Frog::None:
-                        printf(" ");
+                        printf("_");
                         break;
                 }
 
