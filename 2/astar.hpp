@@ -5,29 +5,30 @@
 #include <functional>
 #include <memory>
 
-#include "State.hpp"
+#include "state.hpp"
+
 
 namespace SlidingBlocks
 {
-    using StatePtr = std::shared_ptr<State>;
-    using StateList = std::vector<StatePtr>;
     using HeuristicFunction = std::function<int(const State&, const State&)>;
-
+    using StatePtr = std::shared_ptr<State>;
     struct Node;
     using NodePtr = std::shared_ptr<Node>;
 
     struct Node
     {
-        int G, H;
         StatePtr State;
         NodePtr Parent;
+        int G, H;
 
         Node(StatePtr state, NodePtr parent = nullptr);
 
-        int GetScore() const;
+        bool operator<(const Node& other);
     };
 
-    StateList FindPath(const State& source, const State& target, HeuristicFunction heuristic = ManhattanDistance);
+
+    std::vector<StatePtr> FindPath(const State& source, const State& target, HeuristicFunction heuristic = ManhattanDistance);
 }
+
 
 #endif  // __ASTAR__
