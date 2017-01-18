@@ -16,18 +16,18 @@ namespace Knapsack
             cols = other.cols;
             data = new long long*[rows];
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < rows; ++i)
             {
                 data[i] = new long long[cols];
 
-                for (long long j = 0; j < cols; j++)
+                for (long long j = 0; j < cols; ++j)
                     data[i][j] = other.data[i][j];
             }
         }
 
         void destroy()
         {
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < rows; ++i)
                 delete data[i];
 
             delete data;
@@ -35,7 +35,9 @@ namespace Knapsack
         }
 
     public:
-        IntMatrix(): data(nullptr), rows(0), cols(0)  { }
+        IntMatrix(): data(nullptr), rows(0), cols(0)
+        {
+        }
         IntMatrix(int rows_, long long cols_): data(nullptr), rows(rows_), cols(cols_)
         {
             data = new long long*[rows];
@@ -49,7 +51,7 @@ namespace Knapsack
         }
         IntMatrix& operator=(const IntMatrix& other)
         {
-            if (&other != this)
+            if (this != &other)
             {
                 destroy();
                 copy(other);
