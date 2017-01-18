@@ -8,6 +8,7 @@ BIN := $(BINDIR)/astar
 SRC := $(wildcard *.cpp)
 OBJ := $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(SRC)))
 CH := $(wildcard *.gch)
+
 ifdef DEBUG
 CXXFLAGS += -g -Og
 else

@@ -1,11 +1,20 @@
-PHONY := all clean
+RM := rm -f
 
-all: $(wildcard *.out)
+SRC := $(wildcard *.cpp)
+BIN := $(patsubst %.cpp,%,$(SRC))
 
-%: %.out
+ifdef DEBUG
+CXXFLAGS += -g -Og
+else
+CXXFLAGS += -O3
+endif
 
-%.out: %.cpp
-	$(CC) $(CFLAGS) -g $< -o $@
+.PHONY: all clean
+
+all: $(BIN)
+
+%: %.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -f *.out
+	$(RM) $(BIN)
