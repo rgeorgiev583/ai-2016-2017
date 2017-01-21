@@ -145,7 +145,7 @@ int main()
         {
             visited.push_back(state);
 
-            auto move = [&](Frogs::Step step)
+            auto move = [&trace, state](Frogs::Step step)
             {
                 auto newState = state->Move(step);
                 if (newState)
