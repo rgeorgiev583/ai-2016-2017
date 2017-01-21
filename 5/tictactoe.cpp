@@ -16,38 +16,38 @@ bool TicTacToe::IsWin() const
     switch (move)
     {
         case 0:
-            return Board[1] == parentTurn && Board[2] == parentTurn ||
-                   Board[3] == parentTurn && Board[6] == parentTurn ||
-                   Board[4] == parentTurn && Board[8] == parentTurn;
+            return parentTurn == Board[1] && parentTurn == Board[2] ||
+                   parentTurn == Board[3] && parentTurn == Board[6] ||
+                   parentTurn == Board[4] && parentTurn == Board[8];
         case 1:
-            return Board[0] == parentTurn && Board[2] == parentTurn ||
-                   Board[4] == parentTurn && Board[7] == parentTurn;
+            return parentTurn == Board[0] && parentTurn == Board[2] ||
+                   parentTurn == Board[4] && parentTurn == Board[7];
         case 2:
-            return Board[1] == parentTurn && Board[0] == parentTurn ||
-                   Board[5] == parentTurn && Board[8] == parentTurn ||
-                   Board[4] == parentTurn && Board[6] == parentTurn;
+            return parentTurn == Board[1] && parentTurn == Board[0] ||
+                   parentTurn == Board[5] && parentTurn == Board[8] ||
+                   parentTurn == Board[4] && parentTurn == Board[6];
         case 3:
-            return Board[4] == parentTurn && Board[5] == parentTurn ||
-                   Board[0] == parentTurn && Board[6] == parentTurn;
+            return parentTurn == Board[4] && parentTurn == Board[5] ||
+                   parentTurn == Board[0] && parentTurn == Board[6];
         case 4:
-            return Board[3] == parentTurn && Board[5] == parentTurn ||
-                   Board[1] == parentTurn && Board[7] == parentTurn ||
-                   Board[0] == parentTurn && Board[8] == parentTurn ||
-                   Board[2] == parentTurn && Board[6] == parentTurn;
+            return parentTurn == Board[3] && parentTurn == Board[5] ||
+                   parentTurn == Board[1] && parentTurn == Board[7] ||
+                   parentTurn == Board[0] && parentTurn == Board[8] ||
+                   parentTurn == Board[2] && parentTurn == Board[6];
         case 5:
-            return Board[4] == parentTurn && Board[3] == parentTurn ||
-                   Board[2] == parentTurn && Board[8] == parentTurn;
+            return parentTurn == Board[4] && parentTurn == Board[3] ||
+                   parentTurn == Board[2] && parentTurn == Board[8];
         case 6:
-            return Board[7] == parentTurn && Board[8] == parentTurn ||
-                   Board[3] == parentTurn && Board[0] == parentTurn ||
-                   Board[4] == parentTurn && Board[2] == parentTurn;
+            return parentTurn == Board[7] && parentTurn == Board[8] ||
+                   parentTurn == Board[3] && parentTurn == Board[0] ||
+                   parentTurn == Board[4] && parentTurn == Board[2];
         case 7:
-            return Board[6] == parentTurn && Board[8] == parentTurn ||
-                   Board[4] == parentTurn && Board[1] == parentTurn;
+            return parentTurn == Board[6] && parentTurn == Board[8] ||
+                   parentTurn == Board[4] && parentTurn == Board[1];
         case 8:
-            return Board[7] == parentTurn && Board[6] == parentTurn ||
-                   Board[5] == parentTurn && Board[2] == parentTurn ||
-                   Board[4] == parentTurn && Board[0] == parentTurn;
+            return parentTurn == Board[7] && parentTurn == Board[6] ||
+                   parentTurn == Board[5] && parentTurn == Board[2] ||
+                   parentTurn == Board[4] && parentTurn == Board[0];
         default:
             return false;
     }
@@ -73,11 +73,11 @@ TicTacToe::TicTacToe(const TicTacToe* parent, Integer move, Integer alpha, Integ
 
 void TicTacToe::Search()
 {
-    if (Turn == Max)
+    if (Max == Turn)
     {
         Integer max = -Infinity;
         for (Integer p = 0; p < Size; ++p)
-            if (Board[p] == Zero)
+            if (Zero == Board[p])
             {
                 children[p] = new TicTacToe(this, p, alpha, beta);
                 if (children[p]->Payoff > max)
@@ -93,7 +93,7 @@ void TicTacToe::Search()
     {
         Integer min = +Infinity;
         for (Integer p = 0; p < Size; ++p)
-            if (Board[p] == Zero)
+            if (Zero == Board[p])
             {
                 children[p] = new TicTacToe(this, p, alpha, beta);
                 if (children[p]->Payoff < min)

@@ -39,7 +39,7 @@ int main()
             printf("\n");
             it->Print();
             TicTacToe::Integer move = 0;
-            if (it->Turn == human)
+            if (human == it->Turn)
             {
                 printf("Your move: ");
                 while (true)
@@ -47,18 +47,18 @@ int main()
                     int moveX, moveY;
                     scanf("%d %d", &moveX, &moveY);
                     move = moveY * 3 + moveX;
-                    if (0 <= move && move < TicTacToe::Size && it->Board[move] == TicTacToe::Zero)
+                    if (0 <= move && move < TicTacToe::Size && TicTacToe::Zero == it->Board[move])
                         break;
                     printf("Invalid move!\n");
                 }
             }
             else
             {
-                if (human == TicTacToe::Max)
+                if (TicTacToe::Max == human)
                 {
                     TicTacToe::Integer min = +TicTacToe::Infinity;
                     for (TicTacToe::Integer p = 0; p < TicTacToe::Size; ++p)
-                        if (it->Board[p] == TicTacToe::Zero)
+                        if (TicTacToe::Zero == it->Board[p])
                         {
                             TicTacToe* child = it->GetChild(p);
                             if (child->Payoff < min)
@@ -72,7 +72,7 @@ int main()
                 {
                     TicTacToe::Integer max = -TicTacToe::Infinity;
                     for (TicTacToe::Integer p = 0; p < TicTacToe::Size; ++p)
-                        if (it->Board[p] == TicTacToe::Zero)
+                        if (TicTacToe::Zero == it->Board[p])
                         {
                             TicTacToe* child = it->GetChild(p);
                             if (child->Payoff > max)
@@ -86,7 +86,7 @@ int main()
             }
 
             it = it->GetChild(move);
-            if (it->Depth == TicTacToe::Size || it->IsWin())
+            if (TicTacToe::Size == it->Depth || it->IsWin())
             {
                 printf("\n");
                 it->Print();
