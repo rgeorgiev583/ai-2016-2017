@@ -141,16 +141,17 @@ int main()
         auto state = trace.top();
         trace.pop();
 
-        auto move = [&](Frogs::Step step)
-        {
-            auto newState = state->Move(step);
-            if (newState)
-                trace.push(newState);
-        };
-
         if (visited.crend() == std::find(visited.crbegin(), visited.crend(), state))
         {
             visited.push_back(state);
+
+            auto move = [&](Frogs::Step step)
+            {
+                auto newState = state->Move(step);
+                if (newState)
+                    trace.push(newState);
+            };
+
             move(Frogs::Step::JumpLeft);
             move(Frogs::Step::LeapLeft);
             move(Frogs::Step::JumpRight);
