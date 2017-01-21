@@ -14,15 +14,11 @@ namespace NQueens
 
         int getConflictCount(int row, int col) const
         {
-            int count = 0, n = rows.size();
+            int count = 0;
 
-            for (int i = 0; i < n; ++i)
-                if (i != col)
-                {
-                    int j = rows[i];
-                    if (j == row || abs(j - row) == abs(i - col))
-                        count++;
-                }
+            for (int i = 0; i < rows.size(); ++i)
+                if (i != col && (rows[i] == row || abs(rows[i] - row) == abs(i - col)))
+                    count++;
 
             return count;
         }
@@ -35,28 +31,23 @@ namespace NQueens
 
         void Refill()
         {
-            int n = rows.size();
-
-            for (int i = 0; i < n; ++i)
+            for (int i = 0; i < rows.size(); ++i)
                 rows[i] = i;
 
-            for (int i = 0; i < n; ++i)
-            {
-                int j = generator() % n;
-                std::swap(rows[i], rows[j]);
-            }
+            for (int i = 0; i < rows.size(); ++i)
+                std::swap(rows[i], rows[generator() % rows.size()]);
         }
 
         void Solve()
         {
-            int moveCount = 0, n = rows.size();
-            std::vector<int> candidates;
+            int moveCount = 0;
 
             while (true)
             {
+                std::vector<int> candidates;
+
                 int maxConflicts = 0;
-                candidates.clear();
-                for (int i = 0; i < n; ++i)
+                for (int i = 0; i < rows.size(); ++i)
                 {
                     int conflictCount = getConflictCount(rows[i], i);
                     if (conflictCount > maxConflicts)
@@ -66,14 +57,13 @@ namespace NQueens
                     }
                     candidates.push_back(i);
                 }
-
                 if (maxConflicts == 0)
                     return;
 
                 int worstQueenColumn = candidates[generator() % candidates.size()];
                 int minConflictCount = rows.size();
                 candidates.clear();
-                for (int i = 0; i < n; ++i)
+                for (int i = 0; i < rows.size(); ++i)
                 {
                     int conflictCount = getConflictCount(i, worstQueenColumn);
                     if (conflictCount < minConflictCount)
@@ -88,7 +78,7 @@ namespace NQueens
                     rows[worstQueenColumn] = candidates[generator() % candidates.size()];
 
                 ++moveCount;
-                if (2 * n == moveCount)
+                if (2 * rows.size() == moveCount)
                 {
                     Refill();
                     moveCount = 0;
@@ -98,10 +88,9 @@ namespace NQueens
 
         void Print() const
         {
-            int n = rows.size();
-            for (int i = 0; i < n; ++i)
+            for (int i = 0; i < rows.size(); ++i)
             {
-                for (int j = 0; j < n; ++j)
+                for (int j = 0; j < rows.size(); ++j)
                     printf(rows[j] == i ? "*" : "_");
 
                 printf("\n");
