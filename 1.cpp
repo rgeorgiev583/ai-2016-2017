@@ -138,7 +138,6 @@ int main()
 
     std::vector<std::shared_ptr<Frogs::State> > visited;
     std::stack<std::shared_ptr<Frogs::State> > trace;
-    std::stack<Frogs::Step> movements;
     trace.push(std::make_shared<Frogs::State>(count));
 
     while (!trace.empty() && !trace.top()->WasTargetReached())
@@ -153,16 +152,12 @@ int main()
                 trace.push(newState);
         };
 
-        while (!movements.empty() && state && state->IsStuckJumpLeft() && state->IsStuckLeapLeft() && state->IsStuckJumpRight() && state->IsStuckLeapRight())
-            movements.pop();
-
         if (!state)
             continue;
 
         if (visited.crend() == std::find(visited.crbegin(), visited.crend(), state))
         {
             visited.push_back(state);
-            movements.push(state->GetMovement());
             move(Frogs::Step::JumpLeft);
             move(Frogs::Step::LeapLeft);
             move(Frogs::Step::JumpRight);
