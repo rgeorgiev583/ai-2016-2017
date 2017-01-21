@@ -49,12 +49,12 @@ namespace Frogs
             return lilies[count] == Frog::None;
         }
 
-        std::shared_ptr<State> Move(Step movement) const
+        std::shared_ptr<State> Move(Step step) const
         {
             bool canMove = false;
             auto moved = std::make_shared<State>(*this);
 
-            switch (movement)
+            switch (step)
             {
                 case Step::JumpLeft:
                     if (!moved->IsStuckJumpLeft())
@@ -141,9 +141,9 @@ int main()
         auto state = trace.top();
         trace.pop();
 
-        auto move = [&](Frogs::Step movement)
+        auto move = [&](Frogs::Step step)
         {
-            auto newState = state->Move(movement);
+            auto newState = state->Move(step);
             if (newState)
                 trace.push(newState);
         };
