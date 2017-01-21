@@ -148,9 +148,6 @@ int main()
                 trace.push(newState);
         };
 
-        if (!state)
-            continue;
-
         if (visited.crend() == std::find(visited.crbegin(), visited.crend(), state))
         {
             visited.push_back(state);
