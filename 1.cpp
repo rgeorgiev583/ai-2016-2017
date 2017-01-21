@@ -14,13 +14,12 @@ namespace Frogs
     {
         std::vector<Frog> lilies;
         int count, blankPos;
-        Step movement;
 
     public:
-        State(): count(0), blankPos(-1), movement(Step::None)
+        State(): count(0), blankPos(-1)
         {
         }
-        State(int count): lilies(2 * count + 1), count(count), blankPos(count), movement(Step::None)
+        State(int count): lilies(2 * count + 1), count(count), blankPos(count)
         {
             for (int i = 0; i < count; ++i)
             {
@@ -31,11 +30,9 @@ namespace Frogs
             lilies[blankPos] = Frog::None;
         }
 
-        Step GetMovement()      const  { return movement; }
-
         bool operator==(const State& other) const
         {
-            return count == other.count && lilies == other.lilies && blankPos == other.blankPos && movement == other.movement;
+            return count == other.count && lilies == other.lilies && blankPos == other.blankPos;
         }
 
         bool IsStuckJumpLeft()  const  { return blankPos >= (int)lilies.size() - 1 || lilies[blankPos + 1] != Frog::Green; }
@@ -56,7 +53,6 @@ namespace Frogs
         {
             bool canMove = false;
             auto moved = std::make_shared<State>(*this);
-            moved->movement = movement;
 
             switch (movement)
             {
