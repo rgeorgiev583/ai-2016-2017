@@ -58,7 +58,6 @@ namespace NQueens
 
                 int worstQueenColumn = candidates[generator() % candidates.size()];
                 candidates.clear();
-
                 int minConflictCount = rows.size();
                 for (int i = 0; i < rows.size(); ++i)
                 {
@@ -71,7 +70,6 @@ namespace NQueens
                     if (conflictCount == minConflictCount)
                         candidates.push_back(i);
                 }
-
                 if (!candidates.empty())
                     rows[worstQueenColumn] = candidates[generator() % candidates.size()];
 
