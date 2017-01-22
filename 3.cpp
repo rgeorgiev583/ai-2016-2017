@@ -59,8 +59,9 @@ namespace NQueens
                     return;
 
                 int worstQueenColumn = candidates[generator() % candidates.size()];
-                int minConflictCount = rows.size();
                 candidates.clear();
+
+                int minConflictCount = rows.size();
                 for (int i = 0; i < rows.size(); ++i)
                 {
                     int conflictCount = getConflictCount(i, worstQueenColumn);
@@ -105,8 +106,7 @@ int main()
     if (n < 0)
         return 1;
 
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    NQueens::Board queens(seed, n, 2 * n);
+    NQueens::Board queens(std::chrono::system_clock::now().time_since_epoch().count(), n, 2 * n);
     queens.Solve();
     queens.Print();
     return 0;
