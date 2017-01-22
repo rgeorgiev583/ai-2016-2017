@@ -159,9 +159,13 @@ int main(int argc, char** argv)
             else
                 classify(label, entry);
         }
+
+        return 0;
     };
 
-    readFromFile(argv[1], false);
+    int errcode = readFromFile(argv[1], false);
+    if (errcode)
+        return errcode;
 
     for (auto it = sumX.begin(); it != sumX.end(); it++)
     {
@@ -178,7 +182,7 @@ int main(int argc, char** argv)
         // calculate variances
         std::vector<double> featureVariances(NF);
         const auto& firstData = data[it->first];
-        for (int i = 0; i < firstData.size(); i++)
+        for (int i = 0; i < (int)firstData.size(); i++)
             for (int j = 0; j < NF; j++)
                 featureVariances[j] += (firstData[i][j] - featureMeans[j]) * (firstData[i][j] - featureMeans[j]);
         for (int i = 0; i < NF; i++)
@@ -205,7 +209,9 @@ int main(int argc, char** argv)
     std::cout << "Classifying:" << std::endl;
     std::cout << "class\tprob\tresult" << std::endl;
 
-    readFromFile(argv[2], true);
+    errcode = readFromFile(argv[2], true);
+    if (errcode)
+        return errcode;
     printf("Accuracy: %3.2f %% (%i/%i)\n", 100.0 * correct / totalClassified, correct, totalClassified);
 
     return 0;
