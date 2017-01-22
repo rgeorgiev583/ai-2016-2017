@@ -9,6 +9,8 @@
 #include <functional>
 #include <algorithm>
 
+#include <cmath>
+
 #define SPLIT 20
 
 struct Entry
