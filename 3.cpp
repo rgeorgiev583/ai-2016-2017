@@ -53,7 +53,7 @@ namespace NQueens
                     if (conflictCount > 0)
                         candidates.push_back(i);
                 }
-                if (!candidates.empty())
+                if (candidates.empty())
                     return;
 
                 int worstQueenColumn = candidates[generator() % candidates.size()];
