@@ -48,11 +48,8 @@ namespace NQueens
                 std::vector<int> candidates;
 
                 for (int i = 0; i < rows.size(); ++i)
-                {
-                    int conflictCount = getConflictCount(rows[i], i);
-                    if (conflictCount > 0)
+                    if (getConflictCount(rows[i], i) > 0)
                         candidates.push_back(i);
-                }
                 if (candidates.empty())
                     return;
 
