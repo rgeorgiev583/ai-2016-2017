@@ -162,6 +162,9 @@ std::shared_ptr<SlidingBlocks::State> SlidingBlocks::State::Move(SlidingBlocks::
                 canMove = true;
             }
             break;
+
+        default:
+            break;
     }
 
     if (canMove)

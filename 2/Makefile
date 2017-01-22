@@ -9,6 +9,7 @@ SRC := $(wildcard *.cpp)
 OBJ := $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(SRC)))
 CH := $(wildcard *.gch)
 
+CXXFLAGS += -pedantic -Wall
 ifdef DEBUG
 CXXFLAGS += -g -Og
 else
