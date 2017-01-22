@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 
     auto classify = [&](const std::string& label, const Entry& entry)
     {
-        std::string predlabel = 0;
+        std::string predlabel;
         double maxlikelihood = 0.0;
         double denom = 0.0;
         std::vector<double> probs;
