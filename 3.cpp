@@ -46,18 +46,15 @@ namespace NQueens
             {
                 std::vector<int> candidates;
 
-                int maxConflicts = 0;
+                int totalConflictCount = 0;
                 for (int i = 0; i < rows.size(); ++i)
                 {
                     int conflictCount = getConflictCount(rows[i], i);
-                    if (conflictCount > maxConflicts)
-                    {
-                        maxConflicts = conflictCount;
-                        candidates.clear();
-                    }
-                    candidates.push_back(i);
+                    if (conflictCount > 0)
+                        candidates.push_back(i);
+                    totalConflictCount += conflictCount;
                 }
-                if (maxConflicts == 0)
+                if (0 == totalConflictCount)
                     return;
 
                 int worstQueenColumn = candidates[generator() % candidates.size()];
@@ -71,7 +68,8 @@ namespace NQueens
                         minConflictCount = conflictCount;
                         candidates.clear();
                     }
-                    candidates.push_back(i);
+                    if (conflictCount == minConflictCount)
+                        candidates.push_back(i);
                 }
 
                 if (!candidates.empty())
