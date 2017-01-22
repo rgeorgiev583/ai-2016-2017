@@ -16,51 +16,51 @@ bool TicTacToe::IsWin() const
     switch (move)
     {
         case 0:
-            return parentTurn == Board[1] && parentTurn == Board[2] ||
-                   parentTurn == Board[3] && parentTurn == Board[6] ||
-                   parentTurn == Board[4] && parentTurn == Board[8];
+            return (parentTurn == Board[1] && parentTurn == Board[2]) ||
+                   (parentTurn == Board[3] && parentTurn == Board[6]) ||
+                   (parentTurn == Board[4] && parentTurn == Board[8]);
         case 1:
-            return parentTurn == Board[0] && parentTurn == Board[2] ||
-                   parentTurn == Board[4] && parentTurn == Board[7];
+            return (parentTurn == Board[0] && parentTurn == Board[2]) ||
+                   (parentTurn == Board[4] && parentTurn == Board[7]);
         case 2:
-            return parentTurn == Board[1] && parentTurn == Board[0] ||
-                   parentTurn == Board[5] && parentTurn == Board[8] ||
-                   parentTurn == Board[4] && parentTurn == Board[6];
+            return (parentTurn == Board[1] && parentTurn == Board[0]) ||
+                   (parentTurn == Board[5] && parentTurn == Board[8]) ||
+                   (parentTurn == Board[4] && parentTurn == Board[6]);
         case 3:
-            return parentTurn == Board[4] && parentTurn == Board[5] ||
-                   parentTurn == Board[0] && parentTurn == Board[6];
+            return (parentTurn == Board[4] && parentTurn == Board[5]) ||
+                   (parentTurn == Board[0] && parentTurn == Board[6]);
         case 4:
-            return parentTurn == Board[3] && parentTurn == Board[5] ||
-                   parentTurn == Board[1] && parentTurn == Board[7] ||
-                   parentTurn == Board[0] && parentTurn == Board[8] ||
-                   parentTurn == Board[2] && parentTurn == Board[6];
+            return (parentTurn == Board[3] && parentTurn == Board[5]) ||
+                   (parentTurn == Board[1] && parentTurn == Board[7]) ||
+                   (parentTurn == Board[0] && parentTurn == Board[8]) ||
+                   (parentTurn == Board[2] && parentTurn == Board[6]);
         case 5:
-            return parentTurn == Board[4] && parentTurn == Board[3] ||
-                   parentTurn == Board[2] && parentTurn == Board[8];
+            return (parentTurn == Board[4] && parentTurn == Board[3]) ||
+                   (parentTurn == Board[2] && parentTurn == Board[8]);
         case 6:
-            return parentTurn == Board[7] && parentTurn == Board[8] ||
-                   parentTurn == Board[3] && parentTurn == Board[0] ||
-                   parentTurn == Board[4] && parentTurn == Board[2];
+            return (parentTurn == Board[7] && parentTurn == Board[8]) ||
+                   (parentTurn == Board[3] && parentTurn == Board[0]) ||
+                   (parentTurn == Board[4] && parentTurn == Board[2]);
         case 7:
-            return parentTurn == Board[6] && parentTurn == Board[8] ||
-                   parentTurn == Board[4] && parentTurn == Board[1];
+            return (parentTurn == Board[6] && parentTurn == Board[8]) ||
+                   (parentTurn == Board[4] && parentTurn == Board[1]);
         case 8:
-            return parentTurn == Board[7] && parentTurn == Board[6] ||
-                   parentTurn == Board[5] && parentTurn == Board[2] ||
-                   parentTurn == Board[4] && parentTurn == Board[0];
+            return (parentTurn == Board[7] && parentTurn == Board[6]) ||
+                   (parentTurn == Board[5] && parentTurn == Board[2]) ||
+                   (parentTurn == Board[4] && parentTurn == Board[0]);
         default:
             return false;
     }
 }
 
 TicTacToe::TicTacToe():
-        Turn(Max), move(-1), Depth(0), alpha(-Infinity), beta(+Infinity), parent(nullptr)
+        parent(nullptr), move(-1), alpha(-Infinity), beta(+Infinity), Turn(Max), Depth(0)
 {
     Search();
 }
 
 TicTacToe::TicTacToe(const TicTacToe* parent, Integer move, Integer alpha, Integer beta):
-        Turn(-parent->Turn), move(move), Depth(parent->Depth + 1), alpha(alpha), beta(beta), parent(parent)
+        parent(parent), move(move), alpha(alpha), beta(beta), Turn(-parent->Turn), Depth(parent->Depth + 1)
 {
     std::copy(std::begin(parent->Board), std::end(parent->Board), Board);
     Board[move] = parent->Turn;
