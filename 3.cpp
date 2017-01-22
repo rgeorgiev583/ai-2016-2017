@@ -11,6 +11,7 @@ namespace NQueens
     {
         std::default_random_engine generator;
         std::vector<int> rows;
+        int refillInterval;
 
         int getConflictCount(int row, int col) const
         {
@@ -24,7 +25,7 @@ namespace NQueens
         }
 
     public:
-        Board(unsigned seed, int n): generator(seed), rows(n)
+        Board(unsigned seed, int n, int interval): generator(seed), rows(n), refillInterval(interval)
         {
             Refill();
         }
@@ -76,7 +77,7 @@ namespace NQueens
                     rows[worstQueenColumn] = candidates[generator() % candidates.size()];
 
                 ++moveCount;
-                if (2 * rows.size() == moveCount)
+                if (refillInterval == moveCount)
                 {
                     Refill();
                     moveCount = 0;
@@ -105,7 +106,7 @@ int main()
         return 1;
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    NQueens::Board queens(seed, n);
+    NQueens::Board queens(seed, n, 2 * n);
     queens.Solve();
     queens.Print();
     return 0;
