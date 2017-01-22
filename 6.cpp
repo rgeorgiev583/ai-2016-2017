@@ -126,6 +126,6 @@ int main(int argc, char** argv)
         if (data[*i].Class == *j)
             ++correctCount;
 
-    std::cout << "Accuracy: " << 100.0 * correctCount / testSet.size() << "%";
+    std::cout << "Accuracy: " << 100.0 * correctCount / testSet.size() << "%" << std::endl;
     return 0;
 }
