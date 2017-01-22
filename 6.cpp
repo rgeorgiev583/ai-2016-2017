@@ -98,6 +98,7 @@ int main(int argc, char** argv)
         for (int j = 0; j < k; ++j, ++i)
             neighbors.insert(i->first);
 
+        // getting response
         std::map<std::string, int> classVotes;
 
         for (auto neighbor: neighbors)
@@ -115,6 +116,7 @@ int main(int argc, char** argv)
         std::cout << "Predicted: " << response << ", actual: " << data[test].Class << std::endl;
     }
 
+    // calculating accuracy
     int correctCount = 0;
     auto j = predictions.begin();
 
