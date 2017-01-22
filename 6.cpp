@@ -40,7 +40,6 @@ int main(int argc, char** argv)
         return 1;
 
     std::vector<Entry> data;
-    std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
 
     while (!file.eof())
     {
@@ -63,11 +62,12 @@ int main(int argc, char** argv)
         data.push_back(std::move(entry));
     }
 
-    std::uniform_int_distribution<> dist(0, data.size() - 1);
+    std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<> distribution(0, data.size() - 1);
     std::set<int> trainingSet, testSet;
 
     for (int i = 0; i < data.size(); ++i)
-        if (dist(generator) < SPLIT)
+        if (distribution(generator) < SPLIT)
             testSet.insert(i);
         else
             trainingSet.insert(i);
@@ -122,9 +122,9 @@ int main(int argc, char** argv)
     int correctCount = 0;
     auto j = predictions.begin();
 
-    for (auto i = testSet.begin(); i != testSet.end(); i++, j++)
+    for (auto i = testSet.begin(); i != testSet.end(); ++i, ++j)
         if (data[*i].Class == *j)
-            correctCount++;
+            ++correctCount;
 
     std::cout << "Accuracy: " << 100.0 * correctCount / testSet.size() << "%";
     return 0;
