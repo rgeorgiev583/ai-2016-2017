@@ -17,7 +17,7 @@ namespace NQueens
         {
             int count = 0;
 
-            for (int i = 0; i < rows.size(); ++i)
+            for (int i = 0; i < (int)rows.size(); ++i)
                 if (i != col && (rows[i] == row || abs(rows[i] - row) == abs(i - col)))
                     count++;
 
@@ -32,11 +32,11 @@ namespace NQueens
 
         void Refill()
         {
-            for (int i = 0; i < rows.size(); ++i)
+            for (int i = 0; i < (int)rows.size(); ++i)
                 rows[i] = i;
 
-            for (int i = 0; i < rows.size(); ++i)
-                std::swap(rows[i], rows[generator() % rows.size()]);
+            for (int i = 0; i < (int)rows.size(); ++i)
+                std::swap(rows[i], rows[generator() % (int)rows.size()]);
         }
 
         void Solve()
@@ -47,7 +47,7 @@ namespace NQueens
             {
                 std::vector<int> candidates;
 
-                for (int i = 0; i < rows.size(); ++i)
+                for (int i = 0; i < (int)rows.size(); ++i)
                     if (getConflictCount(rows[i], i) > 0)
                         candidates.push_back(i);
                 if (candidates.empty())
@@ -55,8 +55,8 @@ namespace NQueens
 
                 int worstQueenColumn = candidates[generator() % candidates.size()];
                 candidates.clear();
-                int minConflictCount = rows.size();
-                for (int i = 0; i < rows.size(); ++i)
+                int minConflictCount = (int)rows.size();
+                for (int i = 0; i < (int)rows.size(); ++i)
                 {
                     int conflictCount = getConflictCount(i, worstQueenColumn);
                     if (conflictCount < minConflictCount)
@@ -81,9 +81,9 @@ namespace NQueens
 
         void Print() const
         {
-            for (int i = 0; i < rows.size(); ++i)
+            for (int i = 0; i < (int)rows.size(); ++i)
             {
-                for (int j = 0; j < rows.size(); ++j)
+                for (int j = 0; j < (int)rows.size(); ++j)
                     printf(rows[j] == i ? "*" : "_");
 
                 printf("\n");

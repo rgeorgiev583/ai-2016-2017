@@ -94,7 +94,7 @@ namespace Knapsack
 int main()
 {
     long long m;
-    scanf("%d", &m);
+    scanf("%lld", &m);
     int n;
     scanf("%d", &n);
 
@@ -105,10 +105,10 @@ int main()
 
     for (auto& item: items)
     {
-        scanf("%d", &item.Value);
-        scanf("%d", &item.Weight);
+        scanf("%lld", &item.Value);
+        scanf("%lld", &item.Weight);
     }
 
-    printf("%d\n", Knapsack::Solve(m, items));
+    printf("%lld\n", Knapsack::Solve(m, items));
     return 0;
 }

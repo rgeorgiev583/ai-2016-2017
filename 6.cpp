@@ -63,10 +63,10 @@ int main(int argc, char** argv)
     }
 
     std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
-    std::uniform_int_distribution<> distribution(0, data.size() - 1);
+    std::uniform_int_distribution<> distribution(0, (int)data.size() - 1);
     std::set<int> trainingSet, testSet;
 
-    for (int i = 0; i < data.size(); ++i)
+    for (int i = 0; i < (int)data.size(); ++i)
         if (distribution(generator) < SPLIT)
             testSet.insert(i);
         else

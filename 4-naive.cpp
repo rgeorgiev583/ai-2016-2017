@@ -24,7 +24,7 @@ static long long knapsack(long long maxWeight, const std::vector<Item>& items)
 int main()
 {
     long long m;
-    scanf("%d", &m);
+    scanf("%lld", &m);
     int n;
     scanf("%d", &n);
 
@@ -35,10 +35,10 @@ int main()
 
     for (auto& item: items)
     {
-        scanf("%d", &item.Value);
-        scanf("%d", &item.Weight);
+        scanf("%lld", &item.Value);
+        scanf("%lld", &item.Weight);
     }
 
-    printf("%d\n", knapsack(m, items));
+    printf("%lld\n", knapsack(m, items));
     return 0;
 }

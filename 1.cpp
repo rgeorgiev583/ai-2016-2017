@@ -127,7 +127,7 @@ namespace Frogs
 int main()
 {
     int count;
-    scanf("%u", &count);
+    scanf("%d", &count);
 
     if (count < 0)
         return 1;
