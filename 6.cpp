@@ -11,10 +11,12 @@
 
 #include <cmath>
 
+#define NUM_FIELDS 4
+
 
 struct Entry
 {
-    double SL, SW, PL, PW;
+    std::array<double, NUM_FIELDS> Attributes;
     std::string Class;
 };
 
@@ -49,15 +51,12 @@ int main(int argc, char** argv)
             continue;
         std::istringstream linein(std::move(line));
         Entry entry;
-        std::string sl, sw, pl, pw;
-        std::getline(linein, sl, ',');
-        entry.SL = std::stod(sl, nullptr);
-        std::getline(linein, sw, ',');
-        entry.SW = std::stod(sw, nullptr);
-        std::getline(linein, pl, ',');
-        entry.PL = std::stod(pl, nullptr);
-        std::getline(linein, pw, ',');
-        entry.PW = std::stod(pw, nullptr);
+        for (int i = 0; i < NUM_FIELDS; ++i)
+        {
+            std::string attribute;
+            std::getline(linein, attribute, ',');
+            entry.Attributes[i] = std::stod(attribute, nullptr);
+        }
         std::getline(linein, entry.Class);
         data.push_back(std::move(entry));
     }
@@ -87,8 +86,13 @@ int main(int argc, char** argv)
         std::set<IntDoublePair, CompareSecond> distances;
         auto euclideanDistance = [](const Entry& entry1, const Entry& entry2)
         {
-            auto dSL = entry1.SL - entry2.SL, dSW = entry1.SW - entry2.SW, dPL = entry1.PL - entry2.PL, dPW = entry1.PW - entry2.PW;
-            return sqrt(dSL * dSL + dSW * dSW + dPL * dPL + dPW * dPW);
+            auto sumDeltasSquared = 0;
+            for (int i = 0; i < NUM_FIELDS; i++)
+            {
+                int delta = entry1.Attributes[i] - entry2.Attributes[i];
+                sumDeltasSquared += delta * delta;
+            }
+            return sqrt(sumDeltasSquared);
         };
         for (auto trainer: trainingSet)
             distances.insert(std::make_pair(trainer, euclideanDistance(data[test], data[trainer])));
