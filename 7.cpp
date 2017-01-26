@@ -16,15 +16,6 @@
 #define NUM_FIELDS 16
 
 using Entry = std::array<double, NUM_FIELDS>;
-using IntPair = std::pair<int, int>;
-
-struct CompareSecond: std::binary_function<IntPair, IntPair, bool>
-{
-    bool operator()(const IntPair& a, const IntPair& b)
-    {
-        return a.second < b.second;
-    }
-};
 
 int main(int argc, char** argv)
 {
