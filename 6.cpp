@@ -14,75 +14,67 @@
 #define NUM_FIELDS 4
 
 
-struct Entry
+namespace KNearestNeighbors
 {
-    std::array<double, NUM_FIELDS> Attributes;
-    std::string Class;
-};
-
-using IntDoublePair = std::pair<int, double>;
-
-struct CompareSecond: std::binary_function<IntDoublePair, IntDoublePair, bool>
-{
-    bool operator()(const IntDoublePair& a, const IntDoublePair& b)
+    struct Entry
     {
-        return a.second < b.second;
-    }
-};
+        std::array<double, NUM_FIELDS> Attributes;
+        std::string Class;
+    };
 
+    using IntDoublePair = std::pair<int, double>;
 
-int main(int argc, const char* const* argv)
-{
-    if (argc < 2)
-        return 1;
-
-    // preparing data
-    std::ifstream filein(argv[1]);
-    if (!filein.is_open())
-        return 1;
-
-    std::vector<Entry> data;
-
-    while (!filein.eof())
+    struct CompareSecond: std::binary_function<IntDoublePair, IntDoublePair, bool>
     {
-        std::string line;
-        std::getline(filein, line);
-        if ("" == line)
-            continue;
-        std::istringstream linein(std::move(line));
-        Entry entry;
-        for (auto& attribute: entry.Attributes)
+        bool operator()(const IntDoublePair& a, const IntDoublePair& b)
         {
-            std::string value;
-            std::getline(linein, value, ',');
-            attribute = std::stod(std::move(value), nullptr);
+            return a.second < b.second;
         }
-        std::getline(linein, entry.Class);
-        data.push_back(std::move(entry));
+    };
+
+    bool LoadDataset(const char* filename, std::vector<Entry>& data)
+    {
+        std::ifstream filein(filename);
+        if (!filein.is_open())
+            return false;
+
+        while (!filein.eof())
+        {
+            std::string line;
+            std::getline(filein, line);
+            if ("" == line)
+                continue;
+            std::istringstream linein(std::move(line));
+            Entry entry;
+            for (auto& attribute: entry.Attributes)
+            {
+                std::string value;
+                std::getline(linein, value, ',');
+                attribute = std::stod(std::move(value), nullptr);
+            }
+            std::getline(linein, entry.Class);
+            data.push_back(std::move(entry));
+        }
+
+        return true;
     }
 
-    std::set<int> testSet, trainingSet;
-
-    std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
-    std::uniform_int_distribution<> distribution(0, (int)data.size() - 1);
-    while (testSet.size() < 20)
-        testSet.insert(distribution(generator));
-    while ((int)trainingSet.size() < (int)data.size() - 20)
+    void SplitData(const std::vector<Entry>& data, std::set<int>& trainingSet, std::set<int>& testSet)
     {
-        int index = distribution(generator);
-        if (!testSet.count(index))
-            trainingSet.insert(index);
+        std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+        std::uniform_int_distribution<> distribution(0, (int)data.size() - 1);
+        while (testSet.size() < 20)
+            testSet.insert(distribution(generator));
+        while ((int)trainingSet.size() < (int)data.size() - 20)
+        {
+            int index = distribution(generator);
+            if (!testSet.count(index))
+                trainingSet.insert(index);
+        }
     }
 
-    // generating predictions
-    int correctCount = 0;
-
-    int k;
-    std::cin >> k;
-    std::set<std::string> predictions;
-    for (int test: testSet)
+    void GetNeighbors(const std::vector<Entry>& data, const std::set<int>& trainingSet, int testInstance, int k, std::set<int>& neighbors)
     {
-        // finding neighbors
         std::set<IntDoublePair, CompareSecond> distances;
         auto euclideanDistance = [](const Entry& entry1, const Entry& entry2)
         {
@@ -95,14 +87,15 @@ int main(int argc, const char* const* argv)
             return sqrt(sumDeltasSquared);
         };
         for (int trainer: trainingSet)
-            distances.insert(std::make_pair(trainer, euclideanDistance(data[test], data[trainer])));
+            distances.insert(std::make_pair(trainer, euclideanDistance(data[testInstance], data[trainer])));
 
-        std::set<int> neighbors;
         auto i = distances.begin();
         for (int j = 0; j < k; ++j, ++i)
             neighbors.insert(i->first);
+    }
 
-        // getting response
+    std::string GetResponse(const std::vector<Entry>& data, const std::set<int>& neighbors)
+    {
         std::map<std::string, int> classVotes;
         for (int neighbor: neighbors)
         {
@@ -118,8 +111,36 @@ int main(int argc, const char* const* argv)
             return a.second < b.second;
         };
         auto responsePos = std::max_element(classVotes.begin(), classVotes.end(), compareSecond);
-        auto response = responsePos->first;
-        predictions.insert(response);
+        return responsePos->first;
+    }
+}
+
+int main(int argc, const char* const* argv)
+{
+    if (argc < 2)
+        return 1;
+
+    // preparing data
+    std::vector<KNearestNeighbors::Entry> data;
+    if (!KNearestNeighbors::LoadDataset(argv[1], data))
+        return 2;
+
+    std::set<int> trainingSet, testSet;
+    KNearestNeighbors::SplitData(data, trainingSet, testSet);
+
+    // generating predictions
+    int correctCount = 0;
+
+    int k;
+    std::cin >> k;
+    for (int test: testSet)
+    {
+        // finding neighbors
+        std::set<int> neighbors;
+        KNearestNeighbors::GetNeighbors(data, trainingSet, test, k, neighbors);
+
+        // getting response
+        auto response = KNearestNeighbors::GetResponse(data, neighbors);
         std::cout << "Predicted: " << response << ", actual: " << data[test].Class << std::endl;
         if (response == data[test].Class)
             ++correctCount;
