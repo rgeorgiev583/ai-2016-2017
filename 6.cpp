@@ -86,7 +86,7 @@ int main(int argc, char** argv)
         std::set<IntDoublePair, CompareSecond> distances;
         auto euclideanDistance = [](const Entry& entry1, const Entry& entry2)
         {
-            auto sumDeltasSquared = 0;
+            double sumDeltasSquared = 0;
             for (int i = 0; i < NUM_FIELDS; i++)
             {
                 auto delta = entry1.Attributes[i] - entry2.Attributes[i];
