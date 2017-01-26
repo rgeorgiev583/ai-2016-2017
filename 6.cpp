@@ -31,7 +31,7 @@ struct CompareSecond: std::binary_function<IntDoublePair, IntDoublePair, bool>
 };
 
 
-int main(int argc, char** argv)
+int main(int argc, const char* const* argv)
 {
     if (argc < 2)
         return 1;
