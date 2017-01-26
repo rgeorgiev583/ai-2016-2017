@@ -51,11 +51,11 @@ int main(int argc, char** argv)
             continue;
         std::istringstream linein(std::move(line));
         Entry entry;
-        for (int i = 0; i < NUM_FIELDS; ++i)
+        for (auto& attribute: entry.Attributes)
         {
-            std::string attribute;
-            std::getline(linein, attribute, ',');
-            entry.Attributes[i] = std::stod(attribute, nullptr);
+            std::string value;
+            std::getline(linein, value, ',');
+            attribute = std::stod(std::move(value), nullptr);
         }
         std::getline(linein, entry.Class);
         data.push_back(std::move(entry));
