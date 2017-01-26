@@ -11,7 +11,7 @@
 
 #include <cmath>
 
-#define NUM_FIELDS 4
+#define NUM_FIELDS         4
 #define NUM_TEST_INSTANCES 20
 
 
