@@ -15,6 +15,7 @@
 
 #define NUM_FIELDS 16
 
+
 using Entry = std::array<double, NUM_FIELDS>;
 
 int main(int argc, char** argv)
