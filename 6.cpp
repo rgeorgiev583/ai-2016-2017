@@ -89,7 +89,7 @@ int main(int argc, char** argv)
             auto sumDeltasSquared = 0;
             for (int i = 0; i < NUM_FIELDS; i++)
             {
-                int delta = entry1.Attributes[i] - entry2.Attributes[i];
+                auto delta = entry1.Attributes[i] - entry2.Attributes[i];
                 sumDeltasSquared += delta * delta;
             }
             return sqrt(sumDeltasSquared);
