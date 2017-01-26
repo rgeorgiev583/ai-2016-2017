@@ -19,11 +19,11 @@ struct Entry
     std::string Class;
 };
 
-using IntPair = std::pair<int, int>;
+using IntDoublePair = std::pair<int, double>;
 
-struct CompareSecond: std::binary_function<IntPair, IntPair, bool>
+struct CompareSecond: std::binary_function<IntDoublePair, IntDoublePair, bool>
 {
-    bool operator()(const IntPair& a, const IntPair& b)
+    bool operator()(const IntDoublePair& a, const IntDoublePair& b)
     {
         return a.second < b.second;
     }
@@ -88,11 +88,11 @@ int main(int argc, char** argv)
         {
             return a.second < b.second;
         };
-        std::set<IntPair, CompareSecond> distances;
+        std::set<IntDoublePair, CompareSecond> distances;
 
         auto euclideanDistance = [](const Entry& entry1, const Entry& entry2)
         {
-            int dSL = entry1.SL - entry2.SL, dSW = entry1.SW - entry2.SW, dPL = entry1.PL - entry2.PL, dPW = entry1.PW - entry2.PW;
+            auto dSL = entry1.SL - entry2.SL, dSW = entry1.SW - entry2.SW, dPL = entry1.PL - entry2.PL, dPW = entry1.PW - entry2.PW;
             return sqrt(dSL * dSL + dSW * dSW + dPL * dPL + dPW * dPW);
         };
         for (auto trainer: trainingSet)
