@@ -14,7 +14,6 @@
 #include <cmath>
 
 #define NF 16
-#define SPLIT 20
 
 using Entry = std::array<double, NF>;
 using IntPair = std::pair<int, int>;
