@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
         auto euclideanDistance = [](const Entry& entry1, const Entry& entry2)
         {
-            int dSL = entry1.SL - entry2.SL, dSW = entry1.SW - entry2.SW, dPL = entry1.PL - entry2.PL, dPW = entry1.PL - entry2.PW;
+            int dSL = entry1.SL - entry2.SL, dSW = entry1.SW - entry2.SW, dPL = entry1.PL - entry2.PL, dPW = entry1.PW - entry2.PW;
             return sqrt(dSL * dSL + dSW * dSW + dPL * dPL + dPW * dPW);
         };
         for (auto trainer: trainingSet)
