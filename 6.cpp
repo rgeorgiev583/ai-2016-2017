@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     std::uniform_int_distribution<> distribution(0, (int)data.size() - 1);
     while (testSet.size() < 20)
         testSet.insert(distribution(generator));
-    while (trainingSet.size() < (int)data.size() - 20)
+    while ((int)trainingSet.size() < (int)data.size() - 20)
     {
         int index = distribution(generator);
         if (!testSet.count(index))
