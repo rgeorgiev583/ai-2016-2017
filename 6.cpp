@@ -11,6 +11,7 @@
 
 #include <cmath>
 
+
 struct Entry
 {
     double SL, SW, PL, PW;
@@ -26,6 +27,7 @@ struct CompareSecond: std::binary_function<IntDoublePair, IntDoublePair, bool>
         return a.second < b.second;
     }
 };
+
 
 int main(int argc, char** argv)
 {
