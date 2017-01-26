@@ -80,7 +80,7 @@ int main(int argc, char** argv)
     int k;
     std::cin >> k;
     std::set<std::string> predictions;
-    for (auto test: testSet)
+    for (int test: testSet)
     {
         // finding neighbors
         std::set<IntDoublePair, CompareSecond> distances;
@@ -89,12 +89,12 @@ int main(int argc, char** argv)
             double sumDeltasSquared = 0;
             for (int i = 0; i < NUM_FIELDS; i++)
             {
-                auto delta = entry1.Attributes[i] - entry2.Attributes[i];
+                double delta = entry1.Attributes[i] - entry2.Attributes[i];
                 sumDeltasSquared += delta * delta;
             }
             return sqrt(sumDeltasSquared);
         };
-        for (auto trainer: trainingSet)
+        for (int trainer: trainingSet)
             distances.insert(std::make_pair(trainer, euclideanDistance(data[test], data[trainer])));
 
         std::set<int> neighbors;
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
 
         // getting response
         std::map<std::string, int> classVotes;
-        for (auto neighbor: neighbors)
+        for (int neighbor: neighbors)
         {
             auto response = data[neighbor].Class;
             if (classVotes.count(response))
