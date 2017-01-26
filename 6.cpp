@@ -37,16 +37,16 @@ int main(int argc, const char* const* argv)
         return 1;
 
     // preparing data
-    std::ifstream file(argv[1]);
-    if (!file.is_open())
+    std::ifstream filein(argv[1]);
+    if (!filein.is_open())
         return 1;
 
     std::vector<Entry> data;
 
-    while (!file.eof())
+    while (!filein.eof())
     {
         std::string line;
-        std::getline(file, line);
+        std::getline(filein, line);
         if ("" == line)
             continue;
         std::istringstream linein(std::move(line));
