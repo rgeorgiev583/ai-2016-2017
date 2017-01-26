@@ -12,6 +12,7 @@
 #include <cmath>
 
 #define NUM_FIELDS 4
+#define NUM_TEST_INSTANCES 20
 
 
 namespace KNearestNeighbors
@@ -63,9 +64,9 @@ namespace KNearestNeighbors
     {
         std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
         std::uniform_int_distribution<> distribution(0, (int)data.size() - 1);
-        while (testSet.size() < 20)
+        while (testSet.size() < NUM_TEST_INSTANCES)
             testSet.insert(distribution(generator));
-        while ((int)trainingSet.size() < (int)data.size() - 20)
+        while ((int)trainingSet.size() < (int)data.size() - NUM_TEST_INSTANCES)
         {
             int index = distribution(generator);
             if (!testSet.count(index))
