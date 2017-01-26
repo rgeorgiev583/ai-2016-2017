@@ -62,10 +62,10 @@ int main(int argc, char** argv)
         data.push_back(std::move(entry));
     }
 
+    std::set<int> testSet, trainingSet;
+
     std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_int_distribution<> distribution(0, (int)data.size() - 1);
-    std::set<int> trainingSet, testSet;
-
     while (testSet.size() < 20)
         testSet.insert(distribution(generator));
     while (trainingSet.size() < (int)data.size() - 20)
@@ -76,21 +76,15 @@ int main(int argc, char** argv)
     }
 
     // generating predictions
-    int k;
-    std::cin >> k;
-
-    std::set<std::string> predictions;
     int correctCount = 0;
 
+    int k;
+    std::cin >> k;
+    std::set<std::string> predictions;
     for (auto test: testSet)
     {
         // finding neighbors
-        auto compareSecond = [](const auto& a, const auto& b)
-        {
-            return a.second < b.second;
-        };
         std::set<IntDoublePair, CompareSecond> distances;
-
         auto euclideanDistance = [](const Entry& entry1, const Entry& entry2)
         {
             auto dSL = entry1.SL - entry2.SL, dSW = entry1.SW - entry2.SW, dPL = entry1.PL - entry2.PL, dPW = entry1.PW - entry2.PW;
@@ -106,7 +100,6 @@ int main(int argc, char** argv)
 
         // getting response
         std::map<std::string, int> classVotes;
-
         for (auto neighbor: neighbors)
         {
             auto response = data[neighbor].Class;
@@ -116,6 +109,10 @@ int main(int argc, char** argv)
                 classVotes[response] = 1;
         }
 
+        auto compareSecond = [](const auto& a, const auto& b)
+        {
+            return a.second < b.second;
+        };
         auto responsePos = std::max_element(classVotes.begin(), classVotes.end(), compareSecond);
         auto response = responsePos->first;
         predictions.insert(response);
