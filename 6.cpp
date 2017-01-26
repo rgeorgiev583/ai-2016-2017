@@ -80,6 +80,7 @@ int main(int argc, char** argv)
     std::cin >> k;
 
     std::set<std::string> predictions;
+    int correctCount = 0;
 
     for (auto test: testSet)
     {
@@ -119,16 +120,11 @@ int main(int argc, char** argv)
         auto response = responsePos->first;
         predictions.insert(response);
         std::cout << "Predicted: " << response << ", actual: " << data[test].Class << std::endl;
+        if (response == data[test].Class)
+            ++correctCount;
     }
 
     // calculating accuracy
-    int correctCount = 0;
-    auto j = predictions.begin();
-
-    for (auto i = testSet.begin(); i != testSet.end(); ++i, ++j)
-        if (data[*i].Class == *j)
-            ++correctCount;
-
     std::cout << "Accuracy: " << 100.0 * correctCount / testSet.size() << "%" << std::endl;
     return 0;
 }
