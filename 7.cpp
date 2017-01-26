@@ -13,9 +13,9 @@
 
 #include <cmath>
 
-#define NF 16
+#define NUM_FIELDS 16
 
-using Entry = std::array<double, NF>;
+using Entry = std::array<double, NUM_FIELDS>;
 using IntPair = std::pair<int, int>;
 
 struct CompareSecond: std::binary_function<IntPair, IntPair, bool>
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
             const auto& firstMultinomialLikelihood = multinomialLikelihoods[it->first];
             const auto& firstMean = means[it->first];
             const auto& firstVariance = variances[it->first];
-            for (int j = 0; j < NF; j++)
+            for (int j = 0; j < NUM_FIELDS; j++)
                 switch (decision)
                 {
                     case 2:
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
                     multinomialSums[label] += entry[i];
                 }
             };
-            for (int i = 0; i < NF; i++)
+            for (int i = 0; i < NUM_FIELDS; i++)
             {
                 std::string field;
                 std::getline(linein, field, ',');
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
             }
             std::string field;
             std::getline(linein, field);
-            setField(NF - 1, field);
+            setField(NUM_FIELDS - 1, field);
             if (!isClassification)
             {
                 data[label].push_back(std::move(entry));
@@ -174,30 +174,30 @@ int main(int argc, char** argv)
         std::cout << "feature\tmean\tvar\tstddev\tmnl" << std::endl;
 
         // calculate means
-        std::vector<double> featureMeans(NF);
-        for (int i = 0; i < NF; i++)
+        std::vector<double> featureMeans(NUM_FIELDS);
+        for (int i = 0; i < NUM_FIELDS; i++)
             featureMeans[i] = sumX[it->first][i] / n[it->first];
 
         // calculate variances
-        std::vector<double> featureVariances(NF);
+        std::vector<double> featureVariances(NUM_FIELDS);
         const auto& firstData = data[it->first];
         for (int i = 0; i < (int)firstData.size(); i++)
-            for (int j = 0; j < NF; j++)
+            for (int j = 0; j < NUM_FIELDS; j++)
                 featureVariances[j] += (firstData[i][j] - featureMeans[j]) * (firstData[i][j] - featureMeans[j]);
-        for (int i = 0; i < NF; i++)
+        for (int i = 0; i < NUM_FIELDS; i++)
             featureVariances[i] /= firstData.size();
 
         const auto& firstSumX = sumX[it->first];
         auto firstMultinomialSum = multinomialSums[it->first];
         auto& firstMultinomialLikelihood = multinomialLikelihoods[it->first];
         // calculate multinomial likelihoods
-        for (int i = 0; i < NF; i++)
+        for (int i = 0; i < NUM_FIELDS; i++)
         {
             double mnl = (firstSumX[i] + alpha) / (firstMultinomialSum + (alpha * featureMeans.size()));
             firstMultinomialLikelihood.push_back(mnl);
         }
 
-        for (unsigned int i = 0; i < NF; i++)
+        for (unsigned int i = 0; i < NUM_FIELDS; i++)
             printf("%i\t%2.3f\t%2.3f\t%2.3f\t%2.3f\n",i+1,featureMeans[i],featureVariances[i],sqrt(featureVariances[i]),firstMultinomialLikelihood[i]);
 
         means[it->first] = std::move(featureMeans);
