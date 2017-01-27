@@ -19,7 +19,7 @@ namespace KNearestNeighbors
 {
     struct Entry
     {
-        std::array<double, NUM_FIELDS> Attributes;
+        std::array<double, NUM_FIELDS> Features;
         std::string Class;
     };
 
@@ -57,7 +57,7 @@ namespace KNearestNeighbors
                 double sumDeltasSquared = 0;
                 for (int i = 0; i < NUM_FIELDS; i++)
                 {
-                    double delta = entry1.Attributes[i] - entry2.Attributes[i];
+                    double delta = entry1.Features[i] - entry2.Features[i];
                     sumDeltasSquared += delta * delta;
                 }
                 return sqrt(sumDeltasSquared);
@@ -105,7 +105,7 @@ namespace KNearestNeighbors
                 continue;
             std::istringstream linein(std::move(line));
             Entry entry;
-            for (auto& attribute: entry.Attributes)
+            for (auto& attribute: entry.Features)
             {
                 std::string value;
                 std::getline(linein, value, ',');
