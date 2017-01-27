@@ -75,10 +75,9 @@ namespace Knapsack
 
     long long Solve(long long maxWeight, const std::vector<Item>& items)
     {
-        int size = items.size();
-        IntMatrix knapsack(size + 1, maxWeight + 1);
+        IntMatrix knapsack(items.size() + 1, maxWeight + 1);
 
-        for (int i = 0; i <= size; ++i)
+        for (int i = 0; i <= items.size(); ++i)
             for (long long j = 0; j <= maxWeight; ++j)
                 if (i == 0 || j == 0)
                     knapsack[i][j] = 0;
@@ -87,7 +86,7 @@ namespace Knapsack
                 else
                     knapsack[i][j] = knapsack[i - 1][j];
 
-       return knapsack[size][maxWeight];
+       return knapsack[items.size()][maxWeight];
     }
 }
 
