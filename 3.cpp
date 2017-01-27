@@ -36,7 +36,10 @@ namespace NQueens
                 rows[i] = i;
 
             for (int i = 0; i < (int)rows.size(); ++i)
-                std::swap(rows[i], rows[generator() % (int)rows.size()]);
+            {
+                std::uniform_int_distribution<> distribution(0, (int)rows.size() - 1);
+                std::swap(rows[i], rows[distribution(generator)]);
+            }
         }
 
         void Solve()
@@ -53,7 +56,8 @@ namespace NQueens
                 if (candidates.empty())
                     return;
 
-                int worstQueenColumn = candidates[generator() % candidates.size()];
+                std::uniform_int_distribution<> worstDistribution(0, (int)candidates.size() - 1);
+                int worstQueenColumn = candidates[worstDistribution(generator)];
                 candidates.clear();
                 int minConflictCount = (int)rows.size();
                 for (int i = 0; i < (int)rows.size(); ++i)
@@ -68,7 +72,10 @@ namespace NQueens
                         candidates.push_back(i);
                 }
                 if (!candidates.empty())
-                    rows[worstQueenColumn] = candidates[generator() % candidates.size()];
+                {
+                    std::uniform_int_distribution<> bestDistribution(0, (int)candidates.size() - 1);
+                    rows[worstQueenColumn] = candidates[bestDistribution(generator)];
+                }
 
                 ++moveCount;
                 if (refillInterval == moveCount)
