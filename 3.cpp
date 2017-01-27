@@ -19,13 +19,13 @@ namespace NQueens
 
             for (int i = 0; i < (int)rows.size(); ++i)
                 if (i != col && (rows[i] == row || abs(rows[i] - row) == abs(i - col)))
-                    count++;
+                    ++count;
 
             return count;
         }
 
     public:
-        Board(unsigned seed, int n, int interval): generator(seed), rows(n), refillInterval(interval)
+        Board(unsigned seed, int size, int interval): generator(seed), rows(size), refillInterval(interval)
         {
             Refill();
         }
@@ -57,12 +57,12 @@ namespace NQueens
                     return;
 
                 std::uniform_int_distribution<> worstDistribution(0, (int)candidates.size() - 1);
-                int worstQueenColumn = candidates[worstDistribution(generator)];
+                int worstColumn = candidates[worstDistribution(generator)];
                 candidates.clear();
                 int minConflictCount = (int)rows.size();
                 for (int i = 0; i < (int)rows.size(); ++i)
                 {
-                    int conflictCount = getConflictCount(i, worstQueenColumn);
+                    int conflictCount = getConflictCount(i, worstColumn);
                     if (conflictCount < minConflictCount)
                     {
                         minConflictCount = conflictCount;
@@ -74,7 +74,7 @@ namespace NQueens
                 if (!candidates.empty())
                 {
                     std::uniform_int_distribution<> bestDistribution(0, (int)candidates.size() - 1);
-                    rows[worstQueenColumn] = candidates[bestDistribution(generator)];
+                    rows[worstColumn] = candidates[bestDistribution(generator)];
                 }
 
                 ++moveCount;
