@@ -35,10 +35,10 @@ namespace NQueens
             for (int i = 0; i < (int)rows.size(); ++i)
                 rows[i] = i;
 
-            for (int i = 0; i < (int)rows.size(); ++i)
+            for (int row: rows)
             {
                 std::uniform_int_distribution<> distribution(0, (int)rows.size() - 1);
-                std::swap(rows[i], rows[distribution(generator)]);
+                std::swap(row, rows[distribution(generator)]);
             }
         }
 
@@ -90,8 +90,8 @@ namespace NQueens
         {
             for (int i = 0; i < (int)rows.size(); ++i)
             {
-                for (int j = 0; j < (int)rows.size(); ++j)
-                    printf(rows[j] == i ? "*" : "_");
+                for (int row: rows)
+                    printf(row == i ? "*" : "_");
 
                 printf("\n");
             }
