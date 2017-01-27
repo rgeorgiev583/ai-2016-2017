@@ -16,9 +16,6 @@ namespace Frogs
         int count, blankPos;
 
     public:
-        State(): count(0), blankPos(-1)
-        {
-        }
         State(int count): lilies(2 * count + 1), count(count), blankPos(count)
         {
             for (int i = 0; i < count; ++i)
