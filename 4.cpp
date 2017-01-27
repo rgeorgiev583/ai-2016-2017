@@ -35,9 +35,6 @@ namespace Knapsack
         }
 
     public:
-        IntMatrix(): data(nullptr), rows(0), cols(0)
-        {
-        }
         IntMatrix(int rows_, long long cols_): data(nullptr), rows(rows_), cols(cols_)
         {
             data = new long long*[rows];
