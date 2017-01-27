@@ -35,11 +35,9 @@ namespace NQueens
             for (int i = 0; i < (int)rows.size(); ++i)
                 rows[i] = i;
 
+            std::uniform_int_distribution<> distribution(0, (int)rows.size() - 1);
             for (int row: rows)
-            {
-                std::uniform_int_distribution<> distribution(0, (int)rows.size() - 1);
                 std::swap(row, rows[distribution(generator)]);
-            }
         }
 
         void Solve()
