@@ -17,23 +17,44 @@
 #define NUM_SETS   10
 
 
-namespace NaiveBayesClassifier
+namespace NaiveBayes
 {
-    using Entry = std::array<double, NUM_FIELDS>;
-
-    struct State
+    struct Entry
     {
-        std::map<std::string, std::vector<Entry> > data;
-        std::map<std::string, int> n;
-        std::map<std::string, double> priors;
-        std::map<std::string, std::vector<double> > multinomialLikelihoods;
-        std::map<std::string, int> multinomialSums;
-        std::map<std::string, Entry > sumX;
-        std::map<std::string, std::vector<double> > means;
-        std::map<std::string, std::vector<double> > variances;
+        std::array<double, NUM_FIELDS> Features;
+        std::string Class;
     };
 
-    bool LoadDataset(const char* filename, State& state, int& total)
+    struct DataSet: public std::vector<Entry>
+    {
+        void SplitData(std::vector<std::set<int> >& dataSets)
+        {
+            std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+            std::uniform_int_distribution<> distribution(0, (int)size() - 1);
+            auto addNextSet = [&generator, &distribution, &dataSets](int i, int size)
+            {
+                std::set<int> currentSet;
+
+                while ((int)currentSet.size() < size)
+                {
+                    int index = distribution(generator);
+                    for (const auto& dataSet: dataSets)
+                        if (dataSet.count(index))
+                            continue;
+                    currentSet.insert(index);
+                }
+
+                dataSets.push_back(std::move(currentSet));
+            };
+            int setSize = size() / NUM_SETS;
+            std::cout << "Splitting source dataset into " << NUM_SETS << " subsets of size " << setSize << "." << std::endl;
+            for (int i = 0; i < NUM_SETS - 1; ++i)
+                addNextSet(i, setSize);
+            addNextSet(NUM_SETS - 1, size() % NUM_SETS);
+        }
+    };
+
+    bool LoadDataset(const char* filename, DataSet& data)
     {
         std::ifstream filein(filename);
         if (!filein.is_open())
@@ -46,27 +67,24 @@ namespace NaiveBayesClassifier
             if ("" == line)
                 continue;
             std::istringstream linein(std::move(line));
-            std::string label;
-            std::getline(linein, label, ',');
             Entry entry;
-            auto setField = [&entry, &label, &state](int i, const std::string& field)
+            std::getline(linein, entry.Class, ',');
+            auto setField = [&entry, &data](int i, const std::string& field)
             {
                 switch (field[0])
                 {
                     case 'y':
-                        entry[i] = 1.0;
+                        entry.Features[i] = 1.0;
                         break;
 
                     case 'n':
-                        entry[i] = 0.0;
+                        entry.Features[i] = 0.0;
                         break;
 
                     case '?':
-                        entry[i] = 0.5;
+                        entry.Features[i] = 0.5;
                         break;
                 }
-                state.sumX[label][i] += entry[i];
-                state.multinomialSums[label] += entry[i];
             };
             for (int i = 0; i < NUM_FIELDS; i++)
             {
@@ -77,133 +95,148 @@ namespace NaiveBayesClassifier
             std::string value;
             std::getline(linein, value);
             setField(NUM_FIELDS - 1, value);
-            state.data[label].push_back(std::move(entry));
-            state.n[label]++;
-            total++;
+            data.push_back(std::move(entry));
         }
 
         return true;
     }
 
-    void SplitData(const State& state, std::vector<std::set<int> >& dataSets)
+    struct Classifier
     {
-        std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
-        std::uniform_int_distribution<> distribution(0, (int)state.data.size() - 1);
-        auto addNextSet = [&generator, &distribution, &dataSets](int i, int size)
+        const DataSet& data;
+        std::map<std::string, std::vector<int> > dataMap;
+        std::map<std::string, int> counts;
+        std::map<std::string, double> priors;
+        std::map<std::string, std::vector<double> > multinomialLikelihoods;
+        std::map<std::string, int> multinomialSums;
+        std::map<std::string, Entry> sumX;
+        std::map<std::string, std::vector<double> > means;
+        std::map<std::string, std::vector<double> > variances;
+
+        Classifier(const DataSet& source): data(source)
         {
-            std::set<int> currentSet;
-
-            while (currentSet.size() < size)
-            {
-                int index = distribution(generator);
-                for (const auto& dataSet: dataSets)
-                    if (dataSet.count(index))
-                        continue;
-                currentSet.insert(index);
-            }
-
-            dataSets.push_back(std::move(currentSet));
-        };
-        for (int i = 0; i < NUM_SETS - 1; ++i)
-            addNextSet(i, state.data.size() / NUM_SETS);
-        addNextSet(NUM_SETS - 1, state.data.size() % NUM_SETS);
-    }
-
-    void Train(const State& state)
-    {
-        for (auto it = state.sumX.begin(); it != state.sumX.end(); it++)
-        {
-            state.priors[it->first] = (double)state.n[it->first] / total;
-
-            std::cout << "Class " << it->first << ", prior: " << std::setw(1) << std::setprecision(3) << priors[it->first] << std::endl;
-            std::cout << "feature\tmean\tvar\tstddev\tmnl" << std::endl;
-
-            // calculate means
-            std::vector<double> featureMeans(NUM_FIELDS);
-            for (int i = 0; i < NUM_FIELDS; i++)
-                featureMeans[i] = state.sumX[it->first][i] / state.n[it->first];
-
-            // calculate variances
-            std::vector<double> featureVariances(NUM_FIELDS);
-            const auto& firstData = state.data[it->first];
-            for (int i = 0; i < (int)firstData.size(); i++)
-                for (int j = 0; j < NUM_FIELDS; j++)
-                    featureVariances[j] += (firstData[i][j] - featureMeans[j]) * (firstData[i][j] - featureMeans[j]);
-            for (int i = 0; i < NUM_FIELDS; i++)
-                featureVariances[i] /= firstData.size();
-
-            const auto& firstSumX = state.sumX[it->first];
-            auto firstMultinomialSum = state.multinomialSums[it->first];
-            auto& firstMultinomialLikelihood = state.multinomialLikelihoods[it->first];
-            // calculate multinomial likelihoods
-            for (int i = 0; i < NUM_FIELDS; i++)
-            {
-                double mnl = (firstSumX[i] + state.alpha) / (firstMultinomialSum + (state.alpha * featureMeans.size()));
-                firstMultinomialLikelihood.push_back(mnl);
-            }
-
-            for (unsigned int i = 0; i < NUM_FIELDS; i++)
-                printf("%i\t%2.3f\t%2.3f\t%2.3f\t%2.3f\n",i+1,featureMeans[i],featureVariances[i],sqrt(featureVariances[i]),firstMultinomialLikelihood[i]);
-
-            state.means[it->first] = std::move(featureMeans);
-            state.variances[it->first] = std::move(featureVariances);
         }
-    }
 
-    void Classify(const State& state, const std::string& label, const Entry& entry)
-    {
-        std::string predlabel;
-        double maxlikelihood = 0.0;
-        double denom = 0.0;
-        std::vector<double> probs;
-        for (auto it = state.priors.begin(); it != state.priors.end(); it++)
+        void AddTrainingSet(const std::set<int>& trainingSet)
         {
-            double numer = priors[it->first];
-            const auto& firstMultinomialLikelihood = atate.multinomialLikelihoods[it->first];
-            const auto& firstMean = state.means[it->first];
-            const auto& firstVariance = state.variances[it->first];
-            for (int j = 0; j < NUM_FIELDS; j++)
-                switch (state,decision)
+            for (int i: trainingSet)
+            {
+                for (int j = 0; j < NUM_FIELDS; j++)
                 {
-                    case 2:
-                        // Multinomial
-                        if (entry[j])
-                            numer *= pow(firstMultinomialLikelihood[j], entry[j]);
-                        break;
-
-                    case 3:
-                        // Bernoulli
-                        numer *= pow(firstMean[j], entry[j]) * pow(1.0 - firstMean[j], 1.0 - entry[j]);
-                        break;
-
-                    default:
-                        // Gaussian
-                        numer *= 1 / sqrt(2 * M_PI * firstVariance[j]) * exp((-1 * (entry[j] - firstMean[j]) * (entry[j] -firstMean[j])) / (2 * firstVariance[j]));
-                        break;
+                    sumX[data[i].Class].Features[j] += data[i].Features[j];
+                    multinomialSums[data[i].Class] += data[i].Features[j];
                 }
 
-            if (numer > maxlikelihood)
-            {
-                maxlikelihood = numer;
-                predlabel = it->first;
+                counts[data[i].Class]++;
+                dataMap[data[i].Class].push_back(i);
             }
-            denom += numer;
-            probs.push_back(numer);
         }
 
-        std::cout << predlabel << "\t" << std::setw(1) << std::setprecision(3) << maxlikelihood/denom << "\t";
-        if ("" == label)
-            std::cout << "<no label>" << std::endl;
-        else if (predlabel == label)
+        void Train(double alpha)
         {
-            std::cout << "correct" << std::endl;
-            correct++;
-        }
-        else
-            std::cout << "incorrect" << std::endl;
+            for (const auto& it: sumX)
+            {
+                const std::string& label = it.first;
+                priors[label] = (double)counts[label] / data.size();
 
-        totalClassified++;
-    }
+                std::cout << "Class " << label << ", prior: " << std::setw(1) << std::setprecision(3) << priors[label] << std::endl;
+                std::cout << "feature\tmean\tvar\tstddev\tmnl" << std::endl;
+
+                // calculate means
+                std::vector<double> featureMeans(NUM_FIELDS);
+                for (int i = 0; i < NUM_FIELDS; i++)
+                    featureMeans[i] = sumX[label].Features[i] / counts[label];
+
+                // calculate variances
+                std::vector<double> featureVariances(NUM_FIELDS);
+                const auto& currentData = dataMap[label];
+                for (int currentDataIndex: currentData)
+                    for (int i = 0; i < NUM_FIELDS; i++)
+                    {
+                        double featureDeviation = data[currentDataIndex].Features[i] - featureMeans[i];
+                        featureVariances[i] += featureDeviation * featureDeviation;
+                    }
+                for (auto& featureVariance: featureVariances)
+                    featureVariance /= currentData.size();
+
+                const auto& currentSumX = sumX[label];
+                auto currentMultinomialSum = multinomialSums[label];
+                auto& currentMultinomialLikelihood = multinomialLikelihoods[label];
+                // calculate multinomial likelihoods
+                for (double feature: currentSumX.Features)
+                    currentMultinomialLikelihood.push_back((feature + alpha) / (currentMultinomialSum + alpha * featureMeans.size()));
+
+                for (unsigned int i = 0; i < NUM_FIELDS; i++)
+                    printf("%i\t%2.3f\t%2.3f\t%2.3f\t%2.3f\n",i+1,featureMeans[i],featureVariances[i],sqrt(featureVariances[i]),currentMultinomialLikelihood[i]);
+
+                means[label] = std::move(featureMeans);
+                variances[label] = std::move(featureVariances);
+            }
+        }
+
+        void Classify(const std::set<int>& testSet, int decision)
+        {
+            int correct = 0;
+            std::cout << "Classifying:" << std::endl;
+            std::cout << "class\tprob\tresult" << std::endl;
+
+            for (int i: testSet)
+            {
+                std::string predictedLabel;
+                double maxLikelihood = 0.0;
+                double denominator = 0.0;
+                std::vector<double> probabilities;
+                for (const auto& it: priors)
+                {
+                    const std::string& label = it.first;
+                    double numerator = priors[label];
+                    const auto& currentMultinomialLikelihood = multinomialLikelihoods[label];
+                    const auto& currentMean = means[label];
+                    const auto& currentVariance = variances[label];
+                    for (int j = 0; j < NUM_FIELDS; j++)
+                        switch (decision)
+                        {
+                            case 2:
+                                // Multinomial
+                                if (data[i].Features[j])
+                                    numerator *= pow(currentMultinomialLikelihood[j], data[i].Features[j]);
+                                break;
+
+                            case 3:
+                                // Bernoulli
+                                numerator *= pow(currentMean[j], data[i].Features[j]) * pow(1.0 - currentMean[j], 1.0 - data[i].Features[j]);
+                                break;
+
+                            default:
+                                // Gaussian
+                                numerator *= 1 / sqrt(2 * M_PI * currentVariance[j]) * exp((-1 * (data[i].Features[j] - currentMean[j]) * (data[i].Features[j] - currentMean[j])) / (2 * currentVariance[j]));
+                                break;
+                        }
+
+                    if (numerator > maxLikelihood)
+                    {
+                        maxLikelihood = numerator;
+                        predictedLabel = label;
+                    }
+                    denominator += numerator;
+                    probabilities.push_back(numerator);
+                }
+
+                std::cout << predictedLabel << "\t" << std::setw(1) << std::setprecision(3) << maxLikelihood / denominator << "\t";
+                if ("" == data[i].Class)
+                    std::cout << "<no label>" << std::endl;
+                else if (predictedLabel == data[i].Class)
+                {
+                    std::cout << "correct" << std::endl;
+                    ++correct;
+                }
+                else
+                    std::cout << "incorrect" << std::endl;
+            }
+
+            printf("Accuracy: %3.2f %% (%i/%i)\n", 100.0 * correct / testSet.size(), correct, (int)testSet.size());
+        }
+    };
 }
 
 int main(int argc, char** argv)
@@ -217,23 +250,25 @@ int main(int argc, char** argv)
         return 1;
 
     // preparing data
-    int total = 0, correct = 0, totalClassified = 0;
+    NaiveBayes::DataSet data;
+    if (!NaiveBayes::LoadDataset(argv[1], data))
+        return 2;
 
+    std::vector<std::set<int> > sets;
+    data.SplitData(sets);
+    std::cout << std::endl;
 
-
-    int errcode = readFromFile(argv[1], false);
-    if (errcode)
-        return errcode;
-
-
-    // classify
-    std::cout << "Classifying:" << std::endl;
-    std::cout << "class\tprob\tresult" << std::endl;
-
-    errcode = readFromFile(argv[2], true);
-    if (errcode)
-        return errcode;
-    printf("Accuracy: %3.2f %% (%i/%i)\n", 100.0 * correct / totalClassified, correct, totalClassified);
+    for (int i = 0; i < (int)sets.size(); ++i)
+    {
+        std::cout << "Using subset " << i << " as the test set." << std::endl;
+        NaiveBayes::Classifier classifier(data);
+        for (int j = 0; j < (int)sets.size(); ++j)
+            if (sets[i] != sets[j])
+                classifier.AddTrainingSet(sets[j]);
+        classifier.Train(alpha);
+        classifier.Classify(sets[i], decision);
+        std::cout << std::endl << std::endl;
+    }
 
     return 0;
 }
