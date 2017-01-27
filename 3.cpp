@@ -107,5 +107,6 @@ int main()
     NQueens::Board queens(std::chrono::system_clock::now().time_since_epoch().count(), n, 2 * n);
     queens.Solve();
     queens.Print();
+
     return 0;
 }
