@@ -97,18 +97,16 @@ int main()
     scanf("%lld", &m);
     int n;
     scanf("%d", &n);
-
     if (m < 0 || n < 0)
         return 1;
 
     std::vector<Knapsack::Item> items(n);
-
     for (auto& item: items)
     {
         scanf("%lld", &item.Value);
         scanf("%lld", &item.Weight);
     }
-
     printf("%lld\n", Knapsack::Solve(m, items));
+
     return 0;
 }
