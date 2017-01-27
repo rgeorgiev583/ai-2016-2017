@@ -29,7 +29,7 @@ namespace Frogs
 
         bool operator==(const State& other) const
         {
-            return count == other.count && lilies == other.lilies && blankPos == other.blankPos;
+            return lilies == other.lilies && count == other.count && blankPos == other.blankPos;
         }
 
         bool IsStuckJumpLeft()  const  { return blankPos >= (int)lilies.size() - 1 || lilies[blankPos + 1] != Frog::Green; }
@@ -125,7 +125,6 @@ int main()
 {
     int count;
     scanf("%d", &count);
-
     if (count < 0)
         return 1;
 
@@ -140,6 +139,7 @@ int main()
 
         if (visited.crend() == std::find(visited.crbegin(), visited.crend(), state))
         {
+            state->Print();
             visited.push_back(state);
 
             auto move = [&trace, state](Frogs::Step step)
@@ -148,13 +148,10 @@ int main()
                 if (newState)
                     trace.push(newState);
             };
-
             move(Frogs::Step::JumpLeft);
             move(Frogs::Step::LeapLeft);
             move(Frogs::Step::JumpRight);
             move(Frogs::Step::LeapRight);
-
-            state->Print();
         }
     }
 
