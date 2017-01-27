@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <vector>
 
+
 struct Item
 {
     long long Weight, Value;
@@ -8,7 +9,7 @@ struct Item
 
 static long long knapsack(long long maxWeight, const std::vector<Item>& items)
 {
-    if (items.size() == 0 || maxWeight == 0)
+    if (0 == items.size() || 0 == maxWeight)
         return 0;
 
     auto lastItem = items.back();
@@ -27,18 +28,16 @@ int main()
     scanf("%lld", &m);
     int n;
     scanf("%d", &n);
-
     if (m < 0 || n < 0)
         return 1;
 
     std::vector<Item> items(n);
-
     for (auto& item: items)
     {
         scanf("%lld", &item.Value);
         scanf("%lld", &item.Weight);
     }
-
     printf("%lld\n", knapsack(m, items));
+
     return 0;
 }
